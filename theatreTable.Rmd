@@ -1,0 +1,735 @@
+---
+title: "Theatre table"
+output: html_notebook
+---
+
+This notebook develops the table of utilization by day, by theatre, by session with the total number of cases, minutes(maybe with the mean and median minutes used per session).
+
+The year is defined as the 2016 calender year.
+
+The theatre duration is to be maximized. Start time to be the greater of Anaesthetic start or Operation start. End time is to be the latest of Operation end or Recovery takeover. Duration is defined as the difference between the start and end times.
+
+The data set is the Raw_data set supplied by DQHI and distributed to all parties.
+
+```{r}
+#Open the libraries
+library(tidyverse)
+library(lubridate)
+library(knitr)
+```
+
+```{r}
+#declare the functions
+convertTime <- function(x){
+  time <- hour(x)*60 + minute(x)
+  }
+```
+
+```{r}
+#declare the variables
+Column_names <- c(
+  "Counter",
+  "NHI",
+  "Theatre",
+  "Type",
+  "Original_Ward",
+  "Surgeon",
+  "Surgeon_Teach",
+  "Anaesthetist",
+  "Anaesthetist_Teach", 
+  "Anaesthetic",
+  "Anaesthetist_Risk",
+  "Operation_Code",
+  "Operation_Code_Extention",
+  "PurchaserNumber",
+  "Patient_Side",
+  "Specialty_OverRide",
+  "Booking_In_Date",
+  "Booking_In_Time",
+  "Event_Date",
+  "Arrival_In_Anaesthetic_Room",
+  "Anaesthesia_Start",
+  "Patient_Ready_for_Operation",
+  "Operation_Start",
+  "Operation_End",
+  "Recovery_Takeover",
+  "Patient_Open _Eyes_On_Command,Recovery_Complete",
+  "Left_Recovery",
+  "Anaesthetic_Time",
+  "Operation_Time",
+  "Scrub_Nurse",
+  "Charge_Nurse",
+  "Anaesthetic_Assist",
+  "AnaestheticAssistTeach",
+  "Problem_Code",
+  "DirectMaterialCost",
+  "Planned_Return",
+  "SessionCode",
+  "Verified",
+  "Episode",
+  "AdmissionType",
+  "Modified",
+  "ModifiedBy",
+  "Processed",
+  "Created",
+  "EventComments",
+  "TheatreOther",
+  "PlannedOperation",
+  "GRN",
+  "Admission_Date",
+  "AdmissionWard",
+  "EpisodeNumber",
+  "TimeOut",
+  "UnplannedReturn",
+  "Problem_Description",
+  "Group_Description",
+  "Specialty_Description",
+  "SpecialtyCode",
+  "Operation_Description"
+)
+```
+
+```{r}
+#read the data
+Raw_data <- read_csv("/home/greig/R-projects/Clinical_audits/Theatre/OTIS_rawData.csv", col_names = Column_names, skip = 1)
+#glimpse(Raw_data)
+```
+
+```{r}
+#tidy the data
+Raw_data$NHI <- as.factor(Raw_data$NHI)
+Raw_data$Theatre <- as.factor(Raw_data$Theatre)
+Raw_data$Type <- as.factor(Raw_data$Type)
+Raw_data$Original_Ward <- as.factor(Raw_data$Original_Ward)
+Raw_data$Surgeon <- as.factor(Raw_data$Surgeon)
+Raw_data$Surgeon_Teach <- as.factor(Raw_data$Surgeon_Teach)
+Raw_data$Anaesthetist <- as.factor(Raw_data$Anaesthetist)
+Raw_data$Anaesthetist_Teach <- as.factor(Raw_data$Anaesthetist_Teach)
+Raw_data$Anaesthetic <- as.factor(Raw_data$Anaesthetic)
+Raw_data$Operation_Code <-  as.factor(Raw_data$Operation_Code)
+Raw_data$Operation_Code_Extention <- as.factor(Raw_data$Operation_Code_Extention)
+Raw_data$PurchaserNumber <- as.factor(Raw_data$PurchaserNumber)
+Raw_data$Patient_Side <- as.factor(Raw_data$Patient_Side)
+Raw_data$Specialty_OverRide <- as.factor(Raw_data$Specialty_OverRide)
+Raw_data$Anaesthesia_Start <- as.character(Raw_data$Anaesthesia_Start)
+Raw_data$Operation_Start <- as.character(Raw_data$Operation_Start)
+Raw_data$Operation_End <- as.character(Raw_data$Operation_End)
+Raw_data$Recovery_Takeover <- as.character(Raw_data$Recovery_Takeover)
+Raw_data$Scrub_Nurse <-  as.factor(Raw_data$Scrub_Nurse)
+Raw_data$Charge_Nurse <- as.factor(Raw_data$Charge_Nurse)
+Raw_data$Anaesthetic_Assist <- as.factor(Raw_data$Anaesthetic_Assist)
+Raw_data$AnaestheticAssistTeach <- as.factor(Raw_data$AnaestheticAssistTeach)
+Raw_data$Problem_Code <-  as.factor(Raw_data$Problem_Code)
+Raw_data$Planned_Return <- as.factor(Raw_data$Planned_Return)
+Raw_data$SessionCode <- as.factor(Raw_data$SessionCode)
+Raw_data$AdmissionType <- as.factor(Raw_data$AdmissionType)
+Raw_data$EventComments <- as.factor(Raw_data$EventComments)
+Raw_data$TheatreOther <-  as.factor(Raw_data$TheatreOther)
+Raw_data$PlannedOperation <-  as.factor(Raw_data$PlannedOperation)
+Raw_data$AdmissionWard <- as.factor(Raw_data$AdmissionWard)
+Raw_data$EpisodeNumber <- as.factor(Raw_data$EpisodeNumber)
+Raw_data$TimeOut <- as.factor(Raw_data$TimeOut)
+Raw_data$UnplannedReturn <-  as.factor(Raw_data$UnplannedReturn)
+Raw_data$Problem_Description <- as.factor(Raw_data$Problem_Description)
+Raw_data$Group_Description <- as.factor(Raw_data$Group_Description)
+Raw_data$Specialty_Description <- as.factor(Raw_data$Specialty_Description)
+Raw_data$Operation_Description <- as.factor(Raw_data$Operation_Description)
+#glimpse(Raw_data)
+```
+
+```{r}
+#transform the data
+Raw_data$Op_start <- ifelse(nchar(Raw_data$Anaesthesia_Start) == 4, Raw_data$Operation_Start, Raw_data$Anaesthesia_Start)
+Raw_data$Op_start <- paste(Raw_data$Event_Date, Raw_data$Op_start, sep = " ")
+Raw_data$Op_start <- dmy_hms(Raw_data$Op_start)
+Raw_data$Op_start_min <- convertTime(Raw_data$Op_start)
+
+Raw_data$Op_end <- ifelse(nchar(Raw_data$Recovery_Takeover) == 4, Raw_data$Operation_End, Raw_data$Recovery_Takeover)
+Raw_data$Op_end <- paste(Raw_data$Event_Date, Raw_data$Op_end, sep = " ")
+Raw_data$Op_end <- dmy_hms(Raw_data$Op_end)
+Raw_data$Op_end_min <- convertTime(Raw_data$Op_end)
+
+Raw_data$Op_duration <-  Raw_data$Op_end_min - Raw_data$Op_start_min
+
+Raw_data$Event_Date <- dmy(Raw_data$Event_Date)
+
+Raw_data <- Raw_data %>% 
+  mutate(Month = month(Event_Date), 
+         DOW = wday(Event_Date), 
+         Week = week(Event_Date), 
+         Day_date = yday(Event_Date))
+
+#glimpse(Raw_data)
+```
+
+```{r}
+#select the FY2016
+
+Otis <- Raw_data %>% 
+  filter(Event_Date >= "2016-07-01" & Event_Date < "2017-07-01")
+
+#glimpse(Otis)
+```
+
+Now to select the FY 2016 and to adjust the week counter so it starts as "1" at the start of July 2016
+```{r}
+#Transform Otis data set
+
+Otis$Adjusted_week <- ifelse(Otis$Week > 26, Otis$Week - 26, Otis$Week + 26)
+
+#Declare session times as per 11.July.2017 meeting slide 11
+#Stored as minutes after midnight
+Morning_start <- 495 #8:15
+Morning_end <- 735 #12:15
+Afternoon_start <- 795 #13:15
+Afternoon_end <- 1035 #17:15
+
+glimpse(Otis)
+```
+
+```{r}
+#Count Theatre 1 am
+
+#Filter for Theatre 1 morning and count all lists
+OT1_am <- Otis %>% 
+  filter(Theatre == 1 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+OT1_am <- OT1_am %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+glimpse(OT1_am)
+
+#Count Theatre 1 pm
+
+#Filter for Theatre 1 afternoon and count all lists
+OT1_pm <- Otis %>% 
+  filter(Theatre == 1 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+OT1_pm <- OT1_pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+glimpse(OT1_pm)
+
+TheatreTable <- full_join(OT1_am, OT1_pm, by = "Event_Date")
+TheatreTable <- TheatreTable %>% 
+  rename(Theatre1_am = Count.x, Theatre1_pm = Count.y)
+
+glimpse(TheatreTable)
+
+```
+
+```{r}
+#Count Theatre 2
+
+#Filter for Theatre 2 morning and count all lists
+OT2_am <- Otis %>% 
+  filter(Theatre == 2 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+OT2_am <- OT2_am %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT2_am, by = "Event_Date")
+TheatreTable <- TheatreTable %>% 
+  rename(Theatre2_am = Count)
+
+#Filter for Theatre 2 afternoon and count all lists
+OT2_pm <- Otis %>% 
+  filter(Theatre == 2 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+OT2_pm <- OT2_pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT2_pm, by = "Event_Date")
+TheatreTable <- rename(TheatreTable, Theatre2_pm = Count)
+```
+
+
+```{r}
+#Count Theatre 3
+
+#Filter for Theatre 3 morning and count all lists
+OT3_am <- Otis %>% 
+  filter(Theatre == 3 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+OT3_am <- OT3_am %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT3_am, by = "Event_Date")
+TheatreTable <- TheatreTable %>% 
+  rename(Theatre3_am = Count)
+
+#Filter for Theatre 3 afternoon and count all lists
+OT3_pm <- Otis %>% 
+  filter(Theatre == 3 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+OT3_pm <- OT3_pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT3_pm, by = "Event_Date")
+TheatreTable <- rename(TheatreTable, Theatre3_pm = Count)
+```
+
+```{r}
+#Count Theatre 4
+
+#Filter for Theatre 4 morning and count all lists
+OT4_am <- Otis %>% 
+  filter(Theatre == 4 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+OT4_am <- OT4_am %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT4_am, by = "Event_Date")
+TheatreTable <- TheatreTable %>% 
+  rename(Theatre4_am = Count)
+
+#Filter for Theatre 4 afternoon and count all lists
+OT4_pm <- Otis %>% 
+  filter(Theatre == 4 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+OT4_pm <- OT4_pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT4_pm, by = "Event_Date")
+TheatreTable <- rename(TheatreTable, Theatre4_pm = Count)
+```
+
+```{r}
+#Count Theatre 5
+
+#Filter for Theatre 5 morning and count all lists
+OT5_am <- Otis %>% 
+  filter(Theatre == 5 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+OT5_am <- OT5_am %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT5_am, by = "Event_Date")
+TheatreTable <- TheatreTable %>% 
+  rename(Theatre5_am = Count)
+
+#Filter for Theatre 5 afternoon and count all lists
+OT5_pm <- Otis %>% 
+  filter(Theatre == 5 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+OT5_pm <- OT5_pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT5_pm, by = "Event_Date")
+TheatreTable <- rename(TheatreTable, Theatre5_pm = Count)
+```
+
+```{r}
+#Count Theatre 6
+
+#Filter for Theatre 6 morning and count all lists
+OT6_am <- Otis %>% 
+  filter(Theatre == 6 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+OT6_am <- OT6_am %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT6_am, by = "Event_Date")
+TheatreTable <- TheatreTable %>% 
+  rename(Theatre6_am = Count)
+
+#Filter for Theatre 6 afternoon and count all lists
+OT6_pm <- Otis %>% 
+  filter(Theatre == 6 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+OT6_pm <- OT6_pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT6_pm, by = "Event_Date")
+TheatreTable <- rename(TheatreTable, Theatre6_pm = Count)
+```
+
+```{r}
+#Count Theatre 7
+
+#Filter for Theatre 7 morning and count all lists
+OT7_am <- Otis %>% 
+  filter(Theatre == 7 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+OT7_am <- OT7_am %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT7_am, by = "Event_Date")
+TheatreTable <- TheatreTable %>% 
+  rename(Theatre7_am = Count)
+
+#Filter for Theatre 7 afternoon and count all lists
+OT7_pm <- Otis %>% 
+  filter(Theatre == 7 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+OT7_pm <- OT7_pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(Count = n())
+
+TheatreTable <- full_join(TheatreTable, OT7_pm, by = "Event_Date")
+TheatreTable <- rename(TheatreTable, Theatre7_pm = Count)
+
+glimpse(TheatreTable)
+```
+
+```{r}
+#transpose and export TheatreTable
+
+YearMatch <- read_csv("/home/greig/R-projects/Clinical_audits/Theatre/yearMatch.csv", col_names = "Event_Date")
+YearMatch$Event_Date <- dmy(YearMatch$Event_Date)
+
+TheatreTable_export <- full_join(YearMatch, TheatreTable, by = "Event_Date")
+
+TheatreTable <- arrange(TheatreTable, Event_Date)
+
+write.table(TheatreTable_export, file = "/home/greig/R-projects/Clinical_audits/Theatre/TheatreTable.csv", row.names = FALSE, sep = ",")
+
+```
+
+```{r}
+#export event ID to gather CWD data.
+
+Event_ID <- Otis %>% 
+  select(TimeOut)
+
+write.table(Event_ID, "/home/greig/R-projects/Clinical_audits/Theatre/CWD.csv", sep = ",", row.names = FALSE)
+```
+
+```{r}
+#Countand allocate the minutes used in Theatre 1 am
+
+#Filter for Theatre 1 morning and count all lists
+Min_1am <- Otis %>% 
+  filter(Theatre == 1 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+Min_1am <- Min_1am %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_1am = min(Op_start_min),
+    Session_end_1am = max(Op_end_min),
+    Session_min_used_1am = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_1am <- Min_1am %>% 
+  mutate(
+    Late_start_min_1am = Morning_start - Session_start_1am,
+    Early_finish_min_1am = Session_end_1am - Morning_end,
+    Session_gap_1am = 240 - Session_min_used_1am + Late_start_min_1am + Early_finish_min_1am)
+
+
+#Count and allocate the minutes used in  Theatre 1 pm
+
+#Filter for Theatre 1 afternoon and count all lists
+Min_1pm <- Otis %>% 
+  filter(Theatre == 1 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+Min_1pm <- Min_1pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_1pm = min(Op_start_min),
+    Session_end_1pm = max(Op_end_min),
+    Session_min_used_1pm = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_1pm <- Min_1pm %>% 
+  mutate(
+    Late_start_min_1pm = Afternoon_start - Session_start_1pm,
+    Early_finish_min_1pm = Session_end_1pm - Afternoon_end,
+    Session_gap_1pm = 240 - Session_min_used_1pm + Late_start_min_1pm + Early_finish_min_1pm)
+
+Min_1am$Overrun_min_1am <- ifelse(Min_1am$Early_finish_min_1am > 0, Min_1am$Early_finish_min_1am, 0)
+Min_1am$Early_finish_min_1am <- ifelse(Min_1am$Early_finish_min_1am > 0, 0, Min_1am$Early_finish_min_1am)
+Min_1pm$Overrun_min_1pm <- ifelse(Min_1pm$Early_finish_min_1pm > 0, Min_1pm$Early_finish_min_1pm, 0)
+Min_1pm$Early_finish_min_1pm <- ifelse(Min_1pm$Early_finish_min_1pm > 0, 0, Min_1pm$Early_finish_min_1pm)
+
+MinuteTable <- full_join(Min_1am, Min_1pm, by = "Event_Date")
+
+glimpse(MinuteTable)
+```
+
+```{r}
+#Count and allocate the minutes used in Theatre 2 am
+
+#Filter for Theatre 2 morning and count all lists
+Min_2am <- Otis %>% 
+  filter(Theatre == 2 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+Min_2am <- Min_2am %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_2am = min(Op_start_min),
+    Session_end_2am = max(Op_end_min),
+    Session_min_used_2am = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_2am <- Min_2am %>% 
+  mutate(
+    Late_start_min_2am = Morning_start - Session_start_2am,
+    Early_finish_min_2am = Session_end_2am - Morning_end,
+    Session_gap_2am = 240 - Session_min_used_2am + Late_start_min_2am + Early_finish_min_2am)
+
+Min_2am$Overrun_min_2am <- ifelse(Min_2am$Early_finish_min_2am > 0, Min_2am$Early_finish_min_2am, 0)
+Min_2am$Early_finish_min_2am <- ifelse(Min_2am$Early_finish_min_2am > 0, 0, Min_2am$Early_finish_min_2am)
+
+MinuteTable <-  full_join(MinuteTable, Min_2am, by = "Event_Date")
+
+#Count and allocate the minutes used in Theatre 2 pm
+
+#Filter for Theatre 2 afternoon and count all lists
+Min_2pm <- Otis %>% 
+  filter(Theatre == 2 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+Min_2pm <- Min_2pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_2pm = min(Op_start_min),
+    Session_end_2pm = max(Op_end_min),
+    Session_min_used_2pm = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_2pm <- Min_2pm %>% 
+  mutate(
+    Late_start_min_2pm = Afternoon_start - Session_start_2pm,
+    Early_finish_min_2pm = Session_end_2pm - Afternoon_end,
+    Session_gap_2pm = 240 - Session_min_used_2pm + Late_start_min_2pm + Early_finish_min_2pm)
+
+Min_2pm$Overrun_min_2pm <- ifelse(Min_2pm$Early_finish_min_2pm > 0, Min_2pm$Early_finish_min_2pm, 0)
+Min_2pm$Early_finish_min_2pm <- ifelse(Min_2pm$Early_finish_min_2pm > 0, 0, Min_2pm$Early_finish_min_2pm)
+
+MinuteTable <- full_join(MinuteTable, Min_2pm, by = "Event_Date")
+
+```
+
+
+```{r}
+#Count and allocate the minutes used in Theatre 3 am
+
+#Filter for Theatre 3 morning and count all lists
+Min_3am <- Otis %>% 
+  filter(Theatre == 3 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+Min_3am <- Min_3am %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_3am = min(Op_start_min),
+    Session_end_3am = max(Op_end_min),
+    Session_min_used_3am = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_3am <- Min_3am %>% 
+  mutate(
+    Late_start_min_3am = Morning_start - Session_start_3am,
+    Early_finish_min_3am = Session_end_3am - Morning_end,
+    Session_gap_3am = 240 - Session_min_used_3am + Late_start_min_3am + Early_finish_min_3am)
+
+Min_3am$Overrun_min_3am <- ifelse(Min_3am$Early_finish_min_3am > 0, Min_3am$Early_finish_min_3am, 0)
+Min_3am$Early_finish_min_3am <- ifelse(Min_3am$Early_finish_min_3am > 0, 0, Min_3am$Early_finish_min_3am)
+
+MinuteTable <-  full_join(MinuteTable, Min_3am, by = "Event_Date")
+
+#Count and allocate the minutes used in Theatre 3 pm
+
+#Filter for Theatre 3 afternoon and count all lists
+Min_3pm <- Otis %>% 
+  filter(Theatre == 3 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+Min_3pm <- Min_3pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_3pm = min(Op_start_min),
+    Session_end_3pm = max(Op_end_min),
+    Session_min_used_3pm = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_3pm <- Min_3pm %>% 
+  mutate(
+    Late_start_min_3pm = Afternoon_start - Session_start_3pm,
+    Early_finish_min_3pm = Session_end_3pm - Afternoon_end,
+    Session_gap_3pm = 240 - Session_min_used_3pm + Late_start_min_3pm + Early_finish_min_3pm)
+
+Min_3pm$Overrun_min_3pm <- ifelse(Min_3pm$Early_finish_min_3pm > 0, Min_3pm$Early_finish_min_3pm, 0)
+Min_3pm$Early_finish_min_3pm <- ifelse(Min_3pm$Early_finish_min_3pm > 0, 0, Min_3pm$Early_finish_min_3pm)
+
+MinuteTable <- full_join(MinuteTable, Min_3pm, by = "Event_Date")
+```
+
+```{r}
+#Count and allocate the minutes used in Theatre 5 am
+
+#Filter for Theatre 5 morning and count all lists
+Min_5am <- Otis %>% 
+  filter(Theatre == 5 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+Min_5am <- Min_5am %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_5am = min(Op_start_min),
+    Session_end_5am = max(Op_end_min),
+    Session_min_used_5am = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_5am <- Min_5am %>% 
+  mutate(
+    Late_start_min_5am = Morning_start - Session_start_5am,
+    Early_finish_min_5am = Session_end_5am - Morning_end,
+    Session_gap_5am = 240 - Session_min_used_5am + Late_start_min_5am + Early_finish_min_5am)
+
+Min_5am$Overrun_min_5am <- ifelse(Min_5am$Early_finish_min_5am > 0, Min_5am$Early_finish_min_5am, 0)
+Min_5am$Early_finish_min_5am <- ifelse(Min_5am$Early_finish_min_5am > 0, 0, Min_5am$Early_finish_min_5am)
+
+MinuteTable <-  full_join(MinuteTable, Min_5am, by = "Event_Date")
+
+#Count and allocate the minutes used in Theatre 5 pm
+
+#Filter for Theatre 5 afternoon and count all lists
+Min_5pm <- Otis %>% 
+  filter(Theatre == 5 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+Min_5pm <- Min_5pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_5pm = min(Op_start_min),
+    Session_end_5pm = max(Op_end_min),
+    Session_min_used_5pm = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_5pm <- Min_5pm %>% 
+  mutate(
+    Late_start_min_5pm = Afternoon_start - Session_start_5pm,
+    Early_finish_min_5pm = Session_end_5pm - Afternoon_end,
+    Session_gap_5pm = 240 - Session_min_used_5pm + Late_start_min_5pm + Early_finish_min_5pm)
+
+Min_5pm$Overrun_min_5pm <- ifelse(Min_5pm$Early_finish_min_5pm > 0, Min_5pm$Early_finish_min_5pm, 0)
+Min_5pm$Early_finish_min_5pm <- ifelse(Min_5pm$Early_finish_min_5pm > 0, 0, Min_5pm$Early_finish_min_5pm)
+
+MinuteTable <- full_join(MinuteTable, Min_5pm, by = "Event_Date")
+```
+
+```{r}
+#Count and allocate the minutes used in Theatre 6 am
+
+#Filter for Theatre 6 morning and count all lists
+Min_6am <- Otis %>% 
+  filter(Theatre == 6 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+Min_6am <- Min_6am %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_6am = min(Op_start_min),
+    Session_end_6am = max(Op_end_min),
+    Session_min_used_6am = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_6am <- Min_6am %>% 
+  mutate(
+    Late_start_min_6am = Morning_start - Session_start_6am,
+    Early_finish_min_6am = Session_end_6am - Morning_end,
+    Session_gap_6am = 240 - Session_min_used_6am + Late_start_min_6am + Early_finish_min_6am)
+
+Min_6am$Overrun_min_6am <- ifelse(Min_6am$Early_finish_min_6am > 0, Min_6am$Early_finish_min_6am, 0)
+Min_6am$Early_finish_min_6am <- ifelse(Min_6am$Early_finish_min_6am > 0, 0, Min_6am$Early_finish_min_6am)
+
+MinuteTable <-  full_join(MinuteTable, Min_6am, by = "Event_Date")
+
+#Count and allocate the minutes used in Theatre 6 pm
+
+#Filter for Theatre 6 afternoon and count all lists
+Min_6pm <- Otis %>% 
+  filter(Theatre == 6 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+Min_6pm <- Min_6pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_6pm = min(Op_start_min),
+    Session_end_6pm = max(Op_end_min),
+    Session_min_used_6pm = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_6pm <- Min_6pm %>% 
+  mutate(
+    Late_start_min_6pm = Afternoon_start - Session_start_6pm,
+    Early_finish_min_6pm = Session_end_6pm - Afternoon_end,
+    Session_gap_6pm = 240 - Session_min_used_6pm + Late_start_min_6pm + Early_finish_min_6pm)
+
+Min_6pm$Overrun_min_6pm <- ifelse(Min_6pm$Early_finish_min_6pm > 0, Min_6pm$Early_finish_min_6pm, 0)
+Min_6pm$Early_finish_min_6pm <- ifelse(Min_6pm$Early_finish_min_6pm > 0, 0, Min_6pm$Early_finish_min_6pm)
+
+MinuteTable <- full_join(MinuteTable, Min_6pm, by = "Event_Date")
+```
+
+```{r}
+#Count and allocate the minutes used in Theatre 7 am
+
+#Filter for Theatre 7 morning and count all lists
+Min_7am <- Otis %>% 
+  filter(Theatre == 7 & Morning_start <= Op_start_min & Op_start_min <= Morning_end)
+
+Min_7am <- Min_7am %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_7am = min(Op_start_min),
+    Session_end_7am = max(Op_end_min),
+    Session_min_used_7am = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_7am <- Min_7am %>% 
+  mutate(
+    Late_start_min_7am = Morning_start - Session_start_7am,
+    Early_finish_min_7am = Session_end_7am - Morning_end,
+    Session_gap_7am = 240 - Session_min_used_7am + Late_start_min_7am + Early_finish_min_7am)
+
+Min_7am$Overrun_min_7am <- ifelse(Min_7am$Early_finish_min_7am > 0, Min_7am$Early_finish_min_7am, 0)
+Min_7am$Early_finish_min_7am <- ifelse(Min_7am$Early_finish_min_7am > 0, 0, Min_7am$Early_finish_min_7am)
+
+MinuteTable <-  full_join(MinuteTable, Min_7am, by = "Event_Date")
+
+#Count and allocate the minutes used in Theatre 7 pm
+
+#Filter for Theatre 7 afternoon and count all lists
+Min_7pm <- Otis %>% 
+  filter(Theatre == 7 & Afternoon_start <= Op_start_min & Op_start_min <= Afternoon_end)
+
+Min_7pm <- Min_7pm %>% 
+  group_by(Event_Date) %>% 
+  summarise(
+    Session_start_7pm = min(Op_start_min),
+    Session_end_7pm = max(Op_end_min),
+    Session_min_used_7pm = sum(Op_duration)) %>% 
+  ungroup()
+
+Min_7pm <- Min_7pm %>% 
+  mutate(
+    Late_start_min_7pm = Afternoon_start - Session_start_7pm,
+    Early_finish_min_7pm = Session_end_7pm - Afternoon_end,
+    Session_gap_7pm = 240 - Session_min_used_7pm + Late_start_min_7pm + Early_finish_min_7pm)
+
+Min_7pm$Overrun_min_7pm <- ifelse(Min_7pm$Early_finish_min_7pm > 0, Min_7pm$Early_finish_min_7pm, 0)
+Min_7pm$Early_finish_min_7pm <- ifelse(Min_7pm$Early_finish_min_7pm > 0, 0, Min_7pm$Early_finish_min_7pm)
+
+MinuteTable <- full_join(MinuteTable, Min_7pm, by = "Event_Date")
+```
+
+```{r}
+YearMatch <- read_csv("/home/greig/R-projects/Clinical_audits/Theatre/yearMatch.csv", col_names = "Event_Date")
+YearMatch$Event_Date <- dmy(YearMatch$Event_Date)
+
+MinuteTable_export <- full_join(YearMatch, MinuteTable, by = "Event_Date")
+
+MinuteTable <- arrange(MinuteTable, Event_Date)
+
+write.table(MinuteTable, file = "/home/greig/R-projects/Clinical_audits/Theatre/MinuteTable.csv", row.names = FALSE, sep = ",")
+```
+
