@@ -899,4 +899,108 @@ ggplot(data = graph_data) +
   theme_economist()
 ```
 
+#Ortho
 
+##Layout {.tabset .tabset-fade}
+
+###CaseCount
+```{r ortho_case_count, echo=FALSE, warning=FALSE, message=FALSE}
+Ortho_list <- Otis %>% 
+  filter(Specialty_Description == "Orthopaedic") %>% 
+  filter(DOW != 1 & DOW !=7) %>% 
+  filter(!is.na(Op_start_min) & !is.na(Op_end_min))
+
+Ortho_list <- Ortho_list %>% 
+  filter(Op_duration > 0)
+```
+
+In 2016 there was `r nrow(Ortho_list)` orthopaedic operations performed (including both acute & elective) where;
+
+1. In the specialiality of Orthopaedic surgery
+2. Between Monday and Friday
+3. Where a recorded anaesthetic starting time was in the morning or afternoon list times
+4. And a operation end time was entered into OTIS.
+
+The summary of the duration os the procedure is;
+
+```{r ortho_case_count_2, echo=FALSE, warning=FALSE, message=FALSE}
+summary(Ortho_list$Op_duration)
+```
+
+###Lists used
+```{r ortho_lists, echo=FALSE, message=FALSE, warning=FALSE}
+Ortho_type <- Otis %>% 
+  filter(Specialty_Description == "Orthopaedic") %>% 
+  filter(AdmissionType == "AC" | AdmissionType == "WL" | AdmissionType == "AA")
+
+Ortho_load <- Ortho_type %>% 
+  group_by(Adjusted_week) %>% 
+  summarize(Count = n_distinct(Anaesthetist)) %>%
+  ungroup()
+
+Ortho_load$Adjusted_week <- as.integer(Ortho_load$Adjusted_week)
+
+ggplot(data = Ortho_load) + 
+  geom_line(aes(x = Adjusted_week, y = Count), colour = "red") +
+  geom_smooth(aes(x = Adjusted_week, y = Count), colour = "red") +
+  labs(title = "Total number of orthopedic lists / week", subtitle = "where a list is one or more cases performed by a single Anaesthetist in a week", x = "Weeks since 1.July.2016", y = "Number of lists") +
+  theme_economist()
+```
+
+###Weekday lists used
+```{r ortho_lists_day, echo=FALSE, message=FALSE, warning=FALSE}
+Ortho_type <- Otis %>% 
+  filter(Specialty_Description == "Orthopaedic") %>% 
+  filter(DOW != 1 & DOW != 7 ) %>% 
+  filter(Morning_start <= Op_start_mn & Op_start_min < Afternoon_end) %>% 
+  filter(AdmissionType == "AC" | AdmissionType == "WL" | AdmissionType == "AA")
+
+Ortho_load <- Ortho_type %>% 
+  group_by(Adjusted_week) %>% 
+  summarize(Count = n_distinct(Anaesthetist)) %>%
+  ungroup()
+
+Ortho_load$Adjusted_week <- as.integer(Ortho_load$Adjusted_week)
+
+ggplot(data = Ortho_load) + 
+  geom_line(aes(x = Adjusted_week, y = Count), colour = "magenta") +
+  geom_smooth(aes(x = Adjusted_week, y = Count), colour = "magenta") +
+  labs(title = "Total number of week day & working hours orthopedic lists / week", subtitle = "where a list is one or more cases performed by a single Anaesthetist in a week", x = "Weeks since 1.July.2016", y = "Number of lists") +
+  theme_economist()
+```
+
+###Time series
+```{r ortho_ts, echo=FALSE, warning=FALSE, message=FALSE}
+Ortho_type <- Otis %>% 
+  filter(Specialty_Description == "Orthopaedic") %>% 
+  filter(AdmissionType == "AC" | AdmissionType == "WL" | AdmissionType == "AA")
+
+Ortho_load <- Ortho_type %>% 
+  group_by(Adjusted_week, AdmissionType) %>% 
+  summarize(Count = n()) %>%
+  ungroup()
+
+Ortho_load$Adjusted_week <- as.integer(Ortho_load$Adjusted_week)
+
+Ortho_load <- Ortho_load %>% 
+  filter(Count != 4 & Adjusted_week != 53) %>% 
+  spread(AdmissionType, Count)
+
+ggplot(data = Ortho_load) +
+  geom_line(aes(x = Adjusted_week, y = AC, colour = "blue")) +
+  geom_smooth(aes(x = Adjusted_week, y = AC, colour = "blue"), se = FALSE) +
+  geom_line(aes(x = Adjusted_week, y = WL, colour = "green")) +
+  geom_smooth(aes(x = Adjusted_week, y = WL, colour = "green"), se = FALSE) +
+  labs(title = "Orthopaedic cases Jan.2016-Apr.2017", x = "Weeks", y = "Number of cases / week") +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue"), labels = c("Acutes", "Electives"))+
+  theme(legend.text = element_text(size = 7)) +
+  theme_economist()
+```
+
+### WL vs AC
+```{r othero_model, echo=FALSE, warning=FALSE, message=FALSE }
+ggplot(data = Ortho_load) +
+  geom_point(aes(x = WL, y = AC), colour = "tomato") +
+  geom_smooth(aes(x = WL, y = AC), colour = "tomato") +
+  labs(title = "Relationship between the number of acute vs elective cases / week", x = "Number of elective cases / week", y = "Number of acute cases /week")
+```
