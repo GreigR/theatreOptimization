@@ -927,6 +927,21 @@ The summary of the procedure duration is;
 summary(Ortho_list$Op_duration)
 ```
 
+###Duration
+```{r ortho_duration, echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(data = Ortho_list, aes(x = Op_duration)) +
+  geom_histogram(fill = "blue", binwidth = 5) +
+  scale_x_continuous(breaks = seq(0, 500, 50)) +
+  labs(title = "Histogram of operation duration", subtitle = "For orthopaedic cases during the working week", x = "Minutes", y = "Frequency") +
+  theme_economist()
+
+ggplot(data = Ortho_list, aes(x = Op_duration)) +
+  stat_ecdf(geom = "step", colour = "blue") +
+  scale_y_continuous(breaks = seq(0,2,0.2)) +
+  labs(title = "Cumulative frequency for operation duration", subtitle = "For orthopaedic cases during the working week", x = "Minutes", y = "Frequency") +
+  theme_economist()
+```
+
 ###Theatre View
 ```{r ortho_theatreView, echo=FALSE, message=FALSE, warning=FALSE}
 ot_count <- array(1:366, dim = c(366,1440))
