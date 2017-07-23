@@ -1221,22 +1221,29 @@ In FY16 there was `r nrow(Ortho_list)` orthopaedic operations performed (includi
 3. Where a recorded anaesthetic starting time was in the morning or afternoon list times
 4. And a operation end time was entered into OTIS.
 
-The summary of the overall procedure duration is;
+The summary of the overall weekday procedure duration is;
 
 ```{r ortho_case_count_2, echo=FALSE, warning=FALSE, message=FALSE}
 summary(Ortho_list$Op_duration)
 ```
 
-But for acute procedures only
+While the summary for all acute procedures is;
 
-```{r ortho_case_count_3, echo=FALSE, warning=FALSE, message=FALSE}
-Ortho_acute <- Ortho_list %>% 
-  filter(Modified == "AC")
+```{r ortho_case_count_acyte, echo=FALSE, warning=FALSE, message=FALSE}
+Ortho_acute <- Otis %>% 
+  filter(SpecialtyCode == "Orthopaedic") %>% 
+  filter(Modified == "AC") %>% 
+  filter(!is.na(Op_start_min) & !is.na(Op_end_min))
+
+Ortho_acute <- Ortho_acute %>% 
+  filter(Op_duration > 0)
 
 summary(Ortho_acute$Op_duration)
+
 ```
 
-###Duration
+
+###Duration-week
 ```{r ortho_duration, echo=FALSE, message=FALSE, warning=FALSE}
 ggplot(data = Ortho_list, aes(x = Op_duration)) +
   geom_histogram(fill = "blue", binwidth = 5) +
@@ -1247,9 +1254,27 @@ ggplot(data = Ortho_list, aes(x = Op_duration)) +
 ggplot(data = Ortho_list, aes(x = Op_duration)) +
   stat_ecdf(geom = "step", colour = "blue") +
   scale_y_continuous(breaks = seq(0,2,0.2)) +
+  scale_x_continuous(breaks = seq(0,500,50)) +
   labs(title = "Cumulative frequency for operation duration", subtitle = "For orthopaedic cases during the working week", x = "Minutes", y = "Frequency") +
   theme_economist()
 ```
+
+###Duration-acute
+```{r ortho_duration_acute, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(data = Ortho_acute, aes(x = Op_duration)) +
+  geom_histogram(fill = "blue", binwidth = 5) +
+  scale_x_continuous(breaks = seq(0, 500, 50)) +
+  labs(title = "Histogram of operation duration", subtitle = "For all ate orthopaedic cases", x = "Minutes", y = "Frequency") +
+  theme_economist()
+
+ggplot(data = Ortho_acute, aes(x = Op_duration)) +
+  stat_ecdf(geom = "step", colour = "blue") +
+  scale_y_continuous(breaks = seq(0,2,0.2)) +
+  scale_x_continuous(breaks = seq(0,500,50)) +
+  labs(title = "Cumulative frequency for operation duration", subtitle = "For all acute orthopaedic cases", x = "Minutes", y = "Frequency") +
+  theme_economist()
+```
+
 
 ###Theatre View
 ```{r ortho_theatreView, echo=FALSE, message=FALSE, warning=FALSE}
