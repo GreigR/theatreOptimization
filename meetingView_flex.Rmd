@@ -22,6 +22,7 @@ library(lubridate)
 library(forcats)
 library(qcc)
 library(tidyr)
+library(forecast)
 ```
 
 ```{r declare_the_functions, echo=FALSE, message=FALSE, warning=FALSE}
@@ -1220,10 +1221,19 @@ In FY16 there was `r nrow(Ortho_list)` orthopaedic operations performed (includi
 3. Where a recorded anaesthetic starting time was in the morning or afternoon list times
 4. And a operation end time was entered into OTIS.
 
-The summary of the procedure duration is;
+The summary of the overall procedure duration is;
 
 ```{r ortho_case_count_2, echo=FALSE, warning=FALSE, message=FALSE}
 summary(Ortho_list$Op_duration)
+```
+
+But for acute procedures only
+
+```{r ortho_case_count_3, echo=FALSE, warning=FALSE, message=FALSE}
+Ortho_acute <- Ortho_list %>% 
+  filter(Modified == "AC")
+
+summary(Ortho_acute$Op_duration)
 ```
 
 ###Duration
@@ -1399,9 +1409,31 @@ ggplot(data = Ortho_load) +
   theme_economist()
 ```
 
-### Relationship
+###Relationship
 ```{r other_model, echo=FALSE, warning=FALSE, message=FALSE }
 ggplot(data = Ortho_load) +
   geom_smooth(aes(x = WL, y = AC), colour = "tomato") +
   labs(title = "Relationship between the number of acute vs elective cases / week", x = "Number of elective cases / week", y = "Number of acute cases /week")
 ```
+
+###Forecast
+```{r Ortho_acute_demand, echo=FALSE, message=FALSE, warning=FALSE}
+Ortho_acute <- Otis %>% 
+  filter(SpecialtyCode == "Orthopaedic" & Modified == "AC")
+
+Ortho_acute <- Ortho_acute %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Count = n()) %>% 
+  ungroup
+
+Ortho_acute <- Ortho_acute %>% 
+  rename(Week = Adjusted_week)
+
+Ortho_ts <- ts(Ortho_acute$Count)
+Ortho_fc <- forecast(Ortho_ts, h = 12,level = c(65,95))
+autoplot(Ortho_fc, showgap = FALSE) +
+  labs(title = "Prediction of acute orthopaedic theatre demand", subtitle = "during the first 12 weeks of FY17-18", x = "Weeks", y = "Number acute cases / week") +
+  theme_economist()
+
+```
+
