@@ -548,7 +548,7 @@ ggplot(data = graph_data) +
   geom_line(aes(x= Time, y = time_stamp, colour = "green")) +
   scale_y_continuous(breaks = seq(0,1,0.2)) +
   scale_x_continuous(breaks = seq(0,24,2)) +
-  ggtitle("               Theatre 3 usage 2016 / min ") +
+  ggtitle("               Theatre usage 2016 / min ") +
   labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
   scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Max # pats/min", "Avg # pats/min")) +
   theme(legend.text = element_text(size = 7)) +
@@ -1380,7 +1380,7 @@ Ortho_load$Adjusted_week <- as.integer(Ortho_load$Adjusted_week)
 ggplot(data = Ortho_load) + 
   geom_line(aes(x = Adjusted_week, y = Count), colour = "red") +
   geom_smooth(aes(x = Adjusted_week, y = Count), colour = "blue") +
-  labs(title = "Total number of orthopedic cases / week", subtitle = "Number of cases performed in a week", x = "Weeks since 1.July.2016", y = "Number of lists") +
+  labs(title = "Total number of orthopedic cases / week", subtitle = "Number of cases performed in a week", x = "Weeks since 1.July.2016", y = "Number of cases") +
   theme_economist()
 ```
 
