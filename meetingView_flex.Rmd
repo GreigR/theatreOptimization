@@ -548,7 +548,7 @@ ggplot(data = graph_data) +
   geom_line(aes(x= Time, y = time_stamp, colour = "green")) +
   scale_y_continuous(breaks = seq(0,1,0.2)) +
   scale_x_continuous(breaks = seq(0,24,2)) +
-  ggtitle("               Theatre usage 2016 / min ") +
+  ggtitle("               Theatre 3 usage 2016 / min ") +
   labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
   scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Max # pats/min", "Avg # pats/min")) +
   theme(legend.text = element_text(size = 7)) +
