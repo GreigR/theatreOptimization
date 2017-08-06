@@ -898,6 +898,241 @@ ggplot(data = graph_data) +
   theme_economist()
 ```
 
+#Total Cases
+
+##layout{.tabset .tabset-fade}
+
+###Suite
+```{r tc_suite, echo=FALSE, warning=FALSE, message=FALSE}
+Case_week <- Otis %>% 
+  group_by(Adjusted_week, Modified) %>% 
+  summarise(Count = n())
+
+Case_week <- spread(Case_week, Modified, Count)
+
+Case_week$Total <- rowSums(Case_week[2:7], na.rm = TRUE)
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = Total), colour = "red") +
+  geom_smooth(aes(x = Adjusted_week, y  = Total), colour = "red") +
+  labs(title = "Total cases / week", subtitle = "For FY16-17", x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = AC, colour = "green")) +
+  geom_line(aes(x = Adjusted_week, y = WL, colour = "blue")) +
+  geom_line(aes(x = Adjusted_week, y = AA, colour = "red")) +
+  ggtitle("Number of cases / week by type") +
+  labs(x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
+  theme(legend.text = element_text(size = 7)) +
+  theme_economist()
+```
+
+###OT1
+```{r tc_ot1, echo=FALSE, warning=FALSE, message=FALSE}
+Case_week <- Otis %>% 
+  filter(Theatre == "1") %>% 
+  group_by(Adjusted_week, Modified) %>% 
+  summarise(Count = n())
+
+Case_week <- spread(Case_week, Modified, Count)
+
+Case_week$Total <- rowSums(Case_week[2:7], na.rm = TRUE)
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = Total), colour = "red") +
+  geom_smooth(aes(x = Adjusted_week, y  = Total), colour = "red") +
+  labs(title = "Total cases for theatre 1 / week", subtitle = "For FY16-17", x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = AC, colour = "green")) +
+  geom_line(aes(x = Adjusted_week, y = WL, colour = "blue")) +
+  geom_line(aes(x = Adjusted_week, y = AA, colour = "red")) +
+  ggtitle("Number of cases for theatre 1 / week by type") +
+  labs(x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
+  theme(legend.text = element_text(size = 7)) +
+  theme_economist()
+```
+
+###OT2
+```{r tc_ot2, echo=FALSE, warning=FALSE, message=FALSE}
+Case_week <- Otis %>% 
+  filter(Theatre == "2") %>% 
+  group_by(Adjusted_week, Modified) %>% 
+  summarise(Count = n())
+
+Case_week <- spread(Case_week, Modified, Count)
+
+Case_week$Total <- rowSums(Case_week[2:7], na.rm = TRUE)
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = Total), colour = "red") +
+  geom_smooth(aes(x = Adjusted_week, y  = Total), colour = "red") +
+  labs(title = "Total cases for theatre 2 / week", subtitle = "For FY16-17", x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = AC, colour = "green")) +
+  geom_line(aes(x = Adjusted_week, y = WL, colour = "blue")) +
+  geom_line(aes(x = Adjusted_week, y = AA, colour = "red")) +
+  ggtitle("Number of cases for theatre 2 / week by type") +
+  labs(x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
+  theme(legend.text = element_text(size = 7)) +
+  theme_economist()
+```
+
+###OT3
+```{r tc_ot3, echo=FALSE, warning=FALSE, message=FALSE}
+Case_week <- Otis %>% 
+  filter(Theatre == "3") %>% 
+  group_by(Adjusted_week, Modified) %>% 
+  summarise(Count = n())
+
+Case_week <- spread(Case_week, Modified, Count)
+
+Case_week$Total <- rowSums(Case_week[2:7], na.rm = TRUE)
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = Total), colour = "red") +
+  geom_smooth(aes(x = Adjusted_week, y  = Total), colour = "red") +
+  labs(title = "Total cases for theatre 3 / week", subtitle = "For FY16-17", x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = AC, colour = "green")) +
+  geom_line(aes(x = Adjusted_week, y = WL, colour = "blue")) +
+  geom_line(aes(x = Adjusted_week, y = AA, colour = "red")) +
+  ggtitle("Number of cases for theatre 3 / week by type") +
+  labs(x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
+  theme(legend.text = element_text(size = 7)) +
+  theme_economist()
+```
+
+###OT4
+```{r tc_ot4, echo=FALSE, warning=FALSE, message=FALSE}
+Case_week <- Otis %>% 
+  filter(Theatre == "4") %>% 
+  group_by(Adjusted_week, Modified) %>% 
+  summarise(Count = n())
+
+Case_week <- spread(Case_week, Modified, Count)
+
+Case_week$Total <- rowSums(Case_week[2:6], na.rm = TRUE)
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = Total), colour = "red") +
+  geom_smooth(aes(x = Adjusted_week, y  = Total), colour = "red") +
+  labs(title = "Total cases for theatre 4 / week", subtitle = "For FY16-17", x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = AC, colour = "green")) +
+  geom_line(aes(x = Adjusted_week, y = WL, colour = "blue")) +
+  geom_line(aes(x = Adjusted_week, y = AA, colour = "red")) +
+  ggtitle("Number of cases for theatre 4 / week by type") +
+  labs(x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
+  theme(legend.text = element_text(size = 7)) +
+  theme_economist()
+```
+
+###OT5
+```{r tc_ot5, echo=FALSE, warning=FALSE, message=FALSE}
+Case_week <- Otis %>% 
+  filter(Theatre == "5") %>% 
+  group_by(Adjusted_week, Modified) %>% 
+  summarise(Count = n())
+
+Case_week <- spread(Case_week, Modified, Count)
+
+Case_week$Total <- rowSums(Case_week[2:6], na.rm = TRUE)
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = Total), colour = "red") +
+  geom_smooth(aes(x = Adjusted_week, y  = Total), colour = "red") +
+  labs(title = "Total cases for theatre 5 / week", subtitle = "For FY16-17", x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = AC, colour = "green")) +
+  geom_line(aes(x = Adjusted_week, y = WL, colour = "blue")) +
+  geom_line(aes(x = Adjusted_week, y = AA, colour = "red")) +
+  ggtitle("Number of cases for theatre 5 / week by type") +
+  labs(x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
+  theme(legend.text = element_text(size = 7)) +
+  theme_economist()
+```
+
+###OT6
+```{r tc_ot6, echo=FALSE, warning=FALSE, message=FALSE}
+Case_week <- Otis %>% 
+  filter(Theatre == "6") %>% 
+  group_by(Adjusted_week, Modified) %>% 
+  summarise(Count = n())
+
+Case_week <- spread(Case_week, Modified, Count)
+
+Case_week$Total <- rowSums(Case_week[2:7], na.rm = TRUE)
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = Total), colour = "red") +
+  geom_smooth(aes(x = Adjusted_week, y  = Total), colour = "red") +
+  labs(title = "Total cases for theatre 6 / week", subtitle = "For FY16-17", x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = AC, colour = "green")) +
+  geom_line(aes(x = Adjusted_week, y = WL, colour = "blue")) +
+  geom_line(aes(x = Adjusted_week, y = AA, colour = "red")) +
+  ggtitle("Number of cases for theatre 6 / week by type") +
+  labs(x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
+  theme(legend.text = element_text(size = 7)) +
+  theme_economist()
+```
+
+###OT7
+```{r tc_ot7, echo=FALSE, warning=FALSE, message=FALSE}
+Case_week <- Otis %>% 
+  filter(Theatre == "7") %>% 
+  group_by(Adjusted_week, Modified) %>% 
+  summarise(Count = n())
+
+Case_week <- spread(Case_week, Modified, Count)
+
+Case_week$Total <- rowSums(Case_week[2:6], na.rm = TRUE)
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = Total), colour = "red") +
+  geom_smooth(aes(x = Adjusted_week, y  = Total), colour = "red") +
+  labs(title = "Total cases for theatre 7 / week", subtitle = "For FY16-17", x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+ggplot(data = Case_week) +
+  geom_line(aes(x = Adjusted_week, y = AC, colour = "green")) +
+  geom_line(aes(x = Adjusted_week, y = WL, colour = "blue")) +
+  geom_line(aes(x = Adjusted_week, y = AA, colour = "red")) +
+  ggtitle("Number of cases for theatre 7 / week by type") +
+  labs(x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
+  theme(legend.text = element_text(size = 7)) +
+  theme_economist()
+```
+
 #Turaround times
 
 ##layout{.tabset .tabset-fade}
