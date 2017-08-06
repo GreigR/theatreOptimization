@@ -1193,14 +1193,14 @@ gap_mean$Month <- as.factor(gap_mean$Month)
 gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  geom_col(aes(x = Month, y = Mean), fill = "chocolate2") +
   labs(title = "Mean turnaround time by month for Theatre 1", x = "Months in FY16", y = "Mean turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
   
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  geom_col(aes(x = Month, y = Median), fill = "yellow3") +
   labs(title = "Median turnaround time by month for Theatre 1", x = "Months in FY16", y = "Median turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
@@ -1262,14 +1262,14 @@ gap_mean$Month <- as.factor(gap_mean$Month)
 gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  geom_col(aes(x = Month, y = Mean), fill = "chocolate2") +
   labs(title = "Mean turnaround time by month for Theatre 2", x = "Months in FY16", y = "Mean turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
   
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  geom_col(aes(x = Month, y = Median), fill = "yellow3") +
   labs(title = "Median turnaround time by month for Theatre 2", x = "Months in FY16", y = "Median turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
@@ -1331,14 +1331,14 @@ gap_mean$Month <- as.factor(gap_mean$Month)
 gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  geom_col(aes(x = Month, y = Mean), fill = "chocolate2") +
   labs(title = "Mean turnaround time by month for Theatre 3", x = "Months in FY16", y = "Mean turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
   
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  geom_col(aes(x = Month, y = Median), fill = "yellow3") +
   labs(title = "Median turnaround time by month for Theatre 3", x = "Months in FY16", y = "Median turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
@@ -1401,14 +1401,14 @@ gap_mean$Month <- as.factor(gap_mean$Month)
 gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  geom_col(aes(x = Month, y = Mean), fill = "chocolate2") +
   labs(title = "Mean turnaround time by month for Theatre 4", x = "Months in FY16", y = "Mean turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
   
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  geom_col(aes(x = Month, y = Median), fill = "yellow3") +
   labs(title = "Median turnaround time by month for Theatre 4", x = "Months in FY16", y = "Median turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
@@ -1470,14 +1470,14 @@ gap_mean$Month <- as.factor(gap_mean$Month)
 gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  geom_col(aes(x = Month, y = Mean), fill = "chocolate2") +
   labs(title = "Mean turnaround time by month for Theatre 5", x = "Months in FY16", y = "Mean turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
   
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  geom_col(aes(x = Month, y = Median), fill = "yellow3") +
   labs(title = "Median turnaround time by month for Theatre 5", x = "Months in FY16", y = "Median turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
@@ -1539,14 +1539,14 @@ gap_mean$Month <- as.factor(gap_mean$Month)
 gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  geom_col(aes(x = Month, y = Mean), fill = "chocolate2") +
   labs(title = "Mean turnaround time by month for Theatre 6", x = "Months in FY16", y = "Mean turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
   
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  geom_col(aes(x = Month, y = Median), fill = "yellow3") +
   labs(title = "Median turnaround time by month for Theatre 6", x = "Months in FY16", y = "Median turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
@@ -1608,14 +1608,14 @@ gap_mean$Month <- as.factor(gap_mean$Month)
 gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  geom_col(aes(x = Month, y = Mean), fill = "chocolate2") +
   labs(title = "Mean turnaround time by month for Theatre 7", x = "Months in FY16", y = "Mean turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
   
 
 ggplot(data = gap_mean) +
-  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  geom_col(aes(x = Month, y = Median), fill = "yellow3") +
   labs(title = "Median turnaround time by month for Theatre 7", x = "Months in FY16", y = "Median turnaround time") +
   theme_economist() +
   theme(legend.position = "none")
