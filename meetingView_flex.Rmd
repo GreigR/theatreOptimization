@@ -210,7 +210,7 @@ Data dashboard for the MDHB theatre optimisaition project.
 
 ![alt text](Waterfall.png)
 
-#Theatre
+#Flow
 
 ##layout{.tabset .tabset-fade}
 
@@ -380,7 +380,7 @@ ggplot(data = graph_data) +
   scale_x_continuous(breaks = seq(0,24,2)) +
   ggtitle("               Theatre 1 usage 2016 / min ") +
   labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Max # pats/min", "Avg # pats/min")) +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Session times", "Avg # pats/min")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
 ```
@@ -465,7 +465,7 @@ ggplot(data = graph_data) +
   scale_x_continuous(breaks = seq(0,24,2)) +
   ggtitle("               Theatre 2 usage 2016 / min ") +
   labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Max # pats/min", "Avg # pats/min")) +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Session times", "Avg # pats/min")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
 ```
@@ -550,7 +550,7 @@ ggplot(data = graph_data) +
   scale_x_continuous(breaks = seq(0,24,2)) +
   ggtitle("               Theatre 3 usage 2016 / min ") +
   labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Max # pats/min", "Avg # pats/min")) +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Session times", "Avg # pats/min")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
 ```
@@ -634,13 +634,11 @@ graph_data <- bind_cols(graph_data, time_stamp)
 
 ggplot(data = graph_data) +
   geom_col(aes(x = Time, y = Average, colour = "red")) +
-  geom_line(aes(x= Time, y = percentile_85, colour = "blue")) +
-  geom_line(aes(x= Time, y = time_stamp, colour = "green")) +
   scale_y_continuous(breaks = seq(0,2,0.2)) +
   scale_x_continuous(breaks = seq(0,24,2)) +
   ggtitle("               Theatre 4 usage 2016 / min ") +
   labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Median # pats/min", "Max # pats/min", "Avg # pats/min")) +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("red" = "red"), labels = c("Session times", "Avg # pats/min")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
 ```
@@ -725,7 +723,7 @@ ggplot(data = graph_data) +
   scale_x_continuous(breaks = seq(0,24,2)) +
   ggtitle("               Theatre 5 usage 2016 / min ") +
   labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Max # pats/min", "Avg # pats/min")) +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Session times", "Avg # pats/min")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
 ```
@@ -810,7 +808,7 @@ ggplot(data = graph_data) +
   scale_x_continuous(breaks = seq(0,24,2)) +
   ggtitle("               Theatre 6 usage 2016 / min ") +
   labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Max # pats/min", "Avg # pats/min")) +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Session times", "Avg # pats/min")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
 ```
@@ -895,12 +893,12 @@ ggplot(data = graph_data) +
   scale_x_continuous(breaks = seq(0,24,2)) +
   ggtitle("               Theatre 7 usage 2016 / min ") +
   labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Max # pats/min", "Avg # pats/min")) +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Session times", "Avg # pats/min")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
 ```
 
-#Gap
+#Turaround times
 
 ##layout{.tabset .tabset-fade}
 
@@ -932,6 +930,9 @@ for (i in 1:row_count) {
 
 gap_list1[[row_count + 1,4]] <- NA
 
+gap_list1 <-  gap_list1 %>% 
+  filter(Gap_1 <240)
+
 ggplot(data = gap_list1, aes(x = Gap_1)) +
   geom_histogram(fill = "blue", binwidth = 5) +
   scale_x_continuous(breaks = seq(0,300,25)) +
@@ -944,6 +945,30 @@ ggplot(data = gap_list1, aes(x = Gap_1)) +
   scale_x_continuous(breaks = seq(0,300,25)) +
   labs(title = "Cumulative frequency of gaps between cases", x = "Minutes") +
   theme_economist()
+
+gap_list1 <- gap_list1 %>% 
+  mutate(Month = month(Event_Date))
+
+gap_mean <- gap_list1 %>% 
+  group_by(Month) %>% 
+  summarise(Mean = mean(Gap_1, na.rm = TRUE), Median = median(Gap_1, na.rm = TRUE))
+
+gap_mean$Month <- as.factor(gap_mean$Month)
+
+gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  labs(title = "Mean turnaround time by month for Theatre 1", x = "Months in FY16", y = "Mean turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
+  
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  labs(title = "Median turnaround time by month for Theatre 1", x = "Months in FY16", y = "Median turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
 ```
 
 ###OT 2
@@ -974,6 +999,9 @@ for (i in 1:row_count) {
 
 gap_list1[[row_count + 1,4]] <- NA
 
+gap_list1 <-  gap_list1 %>% 
+  filter(Gap_1 <240)
+
 ggplot(data = gap_list1, aes(x = Gap_1)) +
   geom_histogram(fill = "blue", binwidth = 5) +
   scale_x_continuous(breaks = seq(0,500,50)) +
@@ -986,6 +1014,30 @@ ggplot(data = gap_list1, aes(x = Gap_1)) +
   scale_x_continuous(breaks = seq(0,500,50)) +
   labs(title = "Cumulative frequency of gaps between cases", x = "Minutes") +
   theme_economist()
+
+gap_list1 <- gap_list1 %>% 
+  mutate(Month = month(Event_Date))
+
+gap_mean <- gap_list1 %>% 
+  group_by(Month) %>% 
+  summarise(Mean = mean(Gap_1, na.rm = TRUE), Median = median(Gap_1, na.rm = TRUE))
+
+gap_mean$Month <- as.factor(gap_mean$Month)
+
+gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  labs(title = "Mean turnaround time by month for Theatre 2", x = "Months in FY16", y = "Mean turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
+  
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  labs(title = "Median turnaround time by month for Theatre 2", x = "Months in FY16", y = "Median turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
 ```
 
 ###OT 3
@@ -1016,6 +1068,9 @@ for (i in 1:row_count) {
 
 gap_list1[[row_count + 1,4]] <- NA
 
+gap_list1 <-  gap_list1 %>% 
+  filter(Gap_1 <240)
+
 ggplot(data = gap_list1, aes(x = Gap_1)) +
   geom_histogram(fill = "blue", binwidth = 5) +
   scale_x_continuous(breaks = seq(0,500,50)) +
@@ -1028,6 +1083,30 @@ ggplot(data = gap_list1, aes(x = Gap_1)) +
   scale_x_continuous(breaks = seq(0,500,50)) +
   labs(title = "Cumulative frequency of gaps between cases", x = "Minutes") +
   theme_economist()
+
+gap_list1 <- gap_list1 %>% 
+  mutate(Month = month(Event_Date))
+
+gap_mean <- gap_list1 %>% 
+  group_by(Month) %>% 
+  summarise(Mean = mean(Gap_1, na.rm = TRUE), Median = median(Gap_1, na.rm = TRUE))
+
+gap_mean$Month <- as.factor(gap_mean$Month)
+
+gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  labs(title = "Mean turnaround time by month for Theatre 3", x = "Months in FY16", y = "Mean turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
+  
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  labs(title = "Median turnaround time by month for Theatre 3", x = "Months in FY16", y = "Median turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
 ```
 
 
@@ -1059,6 +1138,9 @@ for (i in 1:row_count) {
 
 gap_list1[[row_count + 1,4]] <- NA
 
+gap_list1 <-  gap_list1 %>% 
+  filter(Gap_1 <240)
+
 ggplot(data = gap_list1, aes(x = Gap_1)) +
   geom_histogram(fill = "blue", binwidth = 5) +
   scale_x_continuous(breaks = seq(0,500,50)) +
@@ -1071,6 +1153,30 @@ ggplot(data = gap_list1, aes(x = Gap_1)) +
   scale_x_continuous(breaks = seq(0,500,50)) +
   labs(title = "Cumulative frequency of gaps between cases", x = "Minutes") +
   theme_economist()
+
+gap_list1 <- gap_list1 %>% 
+  mutate(Month = month(Event_Date))
+
+gap_mean <- gap_list1 %>% 
+  group_by(Month) %>% 
+  summarise(Mean = mean(Gap_1, na.rm = TRUE), Median = median(Gap_1, na.rm = TRUE))
+
+gap_mean$Month <- as.factor(gap_mean$Month)
+
+gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  labs(title = "Mean turnaround time by month for Theatre 4", x = "Months in FY16", y = "Mean turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
+  
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  labs(title = "Median turnaround time by month for Theatre 4", x = "Months in FY16", y = "Median turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
 ```
 
 ###OT 5
@@ -1101,6 +1207,9 @@ for (i in 1:row_count) {
 
 gap_list1[[row_count + 1,4]] <- NA
 
+gap_list1 <-  gap_list1 %>% 
+  filter(Gap_1 <240)
+
 ggplot(data = gap_list1, aes(x = Gap_1)) +
   geom_histogram(fill = "blue", binwidth = 5) +
   scale_x_continuous(breaks = seq(0,500,50)) +
@@ -1113,6 +1222,30 @@ ggplot(data = gap_list1, aes(x = Gap_1)) +
   scale_x_continuous(breaks = seq(0,500,50)) +
   labs(title = "Cumulative frequency of gaps between cases", x = "Minutes") +
   theme_economist()
+
+gap_list1 <- gap_list1 %>% 
+  mutate(Month = month(Event_Date))
+
+gap_mean <- gap_list1 %>% 
+  group_by(Month) %>% 
+  summarise(Mean = mean(Gap_1, na.rm = TRUE), Median = median(Gap_1, na.rm = TRUE))
+
+gap_mean$Month <- as.factor(gap_mean$Month)
+
+gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  labs(title = "Mean turnaround time by month for Theatre 5", x = "Months in FY16", y = "Mean turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
+  
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  labs(title = "Median turnaround time by month for Theatre 5", x = "Months in FY16", y = "Median turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
 ```
 
 ###OT 6
@@ -1143,6 +1276,9 @@ for (i in 1:row_count) {
 
 gap_list1[[row_count + 1,4]] <- NA
 
+gap_list1 <-  gap_list1 %>% 
+  filter(Gap_1 <240)
+
 ggplot(data = gap_list1, aes(x = Gap_1)) +
   geom_histogram(fill = "blue", binwidth = 5) +
   scale_x_continuous(breaks = seq(0,500,50)) +
@@ -1155,6 +1291,30 @@ ggplot(data = gap_list1, aes(x = Gap_1)) +
   scale_x_continuous(breaks = seq(0,500,50)) +
   labs(title = "Cumulative frequency of gaps between cases", x = "Minutes") +
   theme_economist()
+
+gap_list1 <- gap_list1 %>% 
+  mutate(Month = month(Event_Date))
+
+gap_mean <- gap_list1 %>% 
+  group_by(Month) %>% 
+  summarise(Mean = mean(Gap_1, na.rm = TRUE), Median = median(Gap_1, na.rm = TRUE))
+
+gap_mean$Month <- as.factor(gap_mean$Month)
+
+gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  labs(title = "Mean turnaround time by month for Theatre 6", x = "Months in FY16", y = "Mean turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
+  
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  labs(title = "Median turnaround time by month for Theatre 6", x = "Months in FY16", y = "Median turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
 ```
 
 ###OT 7
@@ -1185,6 +1345,9 @@ for (i in 1:row_count) {
 
 gap_list1[[row_count + 1,4]] <- NA
 
+gap_list1 <-  gap_list1 %>% 
+  filter(Gap_1 <240)
+
 ggplot(data = gap_list1, aes(x = Gap_1)) +
   geom_histogram(fill = "blue", binwidth = 5) +
   scale_x_continuous(breaks = seq(0,500,50)) +
@@ -1197,6 +1360,30 @@ ggplot(data = gap_list1, aes(x = Gap_1)) +
   scale_x_continuous(breaks = seq(0,500,50)) +
   labs(title = "Cumulative frequency of gaps between cases", x = "Minutes") +
   theme_economist()
+
+gap_list1 <- gap_list1 %>% 
+  mutate(Month = month(Event_Date))
+
+gap_mean <- gap_list1 %>% 
+  group_by(Month) %>% 
+  summarise(Mean = mean(Gap_1, na.rm = TRUE), Median = median(Gap_1, na.rm = TRUE))
+
+gap_mean$Month <- as.factor(gap_mean$Month)
+
+gap_mean$Month <- fct_relevel(gap_mean$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Mean, fill = "brown3")) +
+  labs(title = "Mean turnaround time by month for Theatre 7", x = "Months in FY16", y = "Mean turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
+  
+
+ggplot(data = gap_mean) +
+  geom_col(aes(x = Month, y = Median, fill = "yellow3")) +
+  labs(title = "Median turnaround time by month for Theatre 7", x = "Months in FY16", y = "Median turnaround time") +
+  theme_economist() +
+  theme(legend.position = "none")
 ```
 
 #Ortho
@@ -1724,4 +1911,5 @@ autoplot(GenSurg_fc, showgap = FALSE) +
   theme_economist()
 
 ```
+
 
