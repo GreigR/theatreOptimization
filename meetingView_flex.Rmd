@@ -295,7 +295,7 @@ ggplot(data = graph_data) +
   scale_x_continuous(breaks = seq(0,24,2)) +
   ggtitle("               Theatre usage 2016 / min (including Theatre 4)") +
   labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Max # pats/min", "Avg # pats/min")) +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("Top 15% lists", "Session times", "Avg # pats/min")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
 ```
@@ -357,6 +357,7 @@ time_stamp <- time_stamp %>%
 mean_pat <-  apply(ot_count,2, mean)
 mean_pat <-  as.tibble(mean_pat)
 mean_pat <- rename(mean_pat, Average = value)
+
 quantile_pat <- apply(ot_count,2, quantile, 0.85)
 quantile_pat <- as.tibble(quantile_pat)
 quantile_pat <- rename(quantile_pat, percentile_85 = value)
@@ -438,7 +439,7 @@ time_stamp <- as.tibble(time_stamp)
 time_stamp <- time_stamp %>% 
   select(V2) %>% 
   rename(time_stamp = V2)
-
+#write.table(ot_count, "/home/greig/R-projects/Clinical_audits/Theatre/ot_count.csv", sep = ",", row.names = FALSE)
 mean_pat <-  apply(ot_count,2, mean)
 mean_pat <-  as.tibble(mean_pat)
 mean_pat <- rename(mean_pat, Average = value)
@@ -610,7 +611,7 @@ time_stamp <- time_stamp %>%
   select(V2) %>% 
   rename(time_stamp = V2)
 
-mean_pat <-  apply(ot_count,2, mean)
+mean_pat <-  apply(ot_count,2, mean, na.rm = TRUE)
 mean_pat <-  as.tibble(mean_pat)
 mean_pat <- rename(mean_pat, Average = value)
 quantile_pat <- apply(ot_count,2, quantile, 0.85)
@@ -928,6 +929,30 @@ ggplot(data = Case_week) +
   scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
+
+Duration_week <- Otis %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "orchid1")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "violetred")) +
+  labs(title = "Average duration of cases for all theatres", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+Duration_week <- Otis %>% 
+  filter(Modified == "WL") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "yellow1")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "green1")) +
+  labs(title = "Average duration of WL cases for all theatres", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+  
 ```
 
 ###OT1
@@ -1621,530 +1646,97 @@ ggplot(data = gap_mean) +
   theme(legend.position = "none")
 ```
 
-#Ortho
+#Theatre Utilization
 
 ##Layout {.tabset .tabset-fade}
 
-###CaseCount
-```{r ortho_case_count, echo=FALSE, warning=FALSE, message=FALSE}
-Ortho_list <- Otis %>% 
-  filter(SpecialtyCode == "Orthopaedic") %>% 
-  filter(DOW != 1 & DOW !=7) %>% 
-  filter(!is.na(Op_start_min) & !is.na(Op_end_min))
+###Suite
+```{r tu_all, echo=FALSE, message=FALSE, warning=FALSE, results=FALSE}
 
-Ortho_list <- Ortho_list %>% 
-  filter(Op_duration > 0)
-```
+Month_table <- read_csv("/home/greig/R-projects/Clinical_audits/Theatre/Month_table.csv")
 
-In FY16 there was `r nrow(Ortho_list)` orthopaedic operations performed (including both acute & elective) where;
+Month_table$Month <- as.factor(Month_table$Month)
+Month_table$Month <- fct_relevel(Month_table$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
 
-1. In the specialiality of Orthopaedic surgery
-2. Between Monday and Friday
-3. Where a recorded anaesthetic starting time was in the morning or afternoon list times
-4. And a operation end time was entered into OTIS.
+Month_table <-  Month_table %>% 
+  mutate(Theatre1 = Theatre1_am + Theatre1_pm) %>% 
+  mutate(Theatre2 = Theatre2_am + Theatre2_pm) %>% 
+  mutate(Theatre3 = Theatre3_am + Theatre3_pm) %>% 
+  mutate(Theatre5 = Theatre5_am + Theatre5_pm) %>% 
+  mutate(Theatre6 = Theatre6_am + Theatre6_pm) %>% 
+  mutate(Theatre7 = Theatre7_am + Theatre7_pm) %>% 
+  mutate(Theatre_total = Theatre1 + Theatre2 + Theatre3 + Theatre5 + Theatre6 + Theatre7)
 
-The summary of the overall weekday procedure duration is;
-
-```{r ortho_case_count_2, echo=FALSE, warning=FALSE, message=FALSE}
-summary(Ortho_list$Op_duration)
-```
-
-While the summary for all acute procedures is;
-
-```{r ortho_case_count_acyte, echo=FALSE, warning=FALSE, message=FALSE}
-Ortho_acute <- Otis %>% 
-  filter(SpecialtyCode == "Orthopaedic") %>% 
-  filter(Modified == "AC") %>% 
-  filter(!is.na(Op_start_min) & !is.na(Op_end_min))
-
-Ortho_acute <- Ortho_acute %>% 
-  filter(Op_duration > 0)
-
-summary(Ortho_acute$Op_duration)
+ggplot(data = Month_table) +
+  geom_col(aes(x = Month, y = Theatre_total, fill = "red")) +
+  labs(title = "Total used elective sessions per month", x = "Months in FY16", y = "Number of sessions") +
+  theme_economist() +
+  theme(legend.position = "none")
 
 ```
 
+###OT 1
+```{r tu_1, echo=FALSE, message=FALSE, warning=FALSE, results=FALSE}
 
-###Duration-week
-```{r ortho_duration, echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = Ortho_list, aes(x = Op_duration)) +
-  geom_histogram(fill = "blue", binwidth = 5) +
-  scale_x_continuous(breaks = seq(0, 500, 50)) +
-  labs(title = "Histogram of operation duration", subtitle = "For orthopaedic cases during the working week", x = "Minutes", y = "Frequency") +
-  theme_economist()
-
-ggplot(data = Ortho_list, aes(x = Op_duration)) +
-  stat_ecdf(geom = "step", colour = "blue") +
-  scale_y_continuous(breaks = seq(0,2,0.2)) +
-  scale_x_continuous(breaks = seq(0,500,50)) +
-  labs(title = "Cumulative frequency for operation duration", subtitle = "For orthopaedic cases during the working week", x = "Minutes", y = "Frequency") +
-  theme_economist()
-```
-
-###Duration-acute
-```{r ortho_duration_acute, echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(data = Ortho_acute, aes(x = Op_duration)) +
-  geom_histogram(fill = "blue", binwidth = 5) +
-  scale_x_continuous(breaks = seq(0, 500, 50)) +
-  labs(title = "Histogram of operation duration", subtitle = "For all ate orthopaedic cases", x = "Minutes", y = "Frequency") +
-  theme_economist()
-
-ggplot(data = Ortho_acute, aes(x = Op_duration)) +
-  stat_ecdf(geom = "step", colour = "blue") +
-  scale_y_continuous(breaks = seq(0,2,0.2)) +
-  scale_x_continuous(breaks = seq(0,500,50)) +
-  labs(title = "Cumulative frequency for operation duration", subtitle = "For all acute orthopaedic cases", x = "Minutes", y = "Frequency") +
-  theme_economist()
-```
-
-
-###Theatre View
-```{r ortho_theatreView, echo=FALSE, message=FALSE, warning=FALSE}
-ot_count <- array(1:366, dim = c(366,1440))
-  for (i in 1:366) {
-    for (j in 1:1440) {
-      ot_count[[i,j]] <- 0
-    }
-  }
- graphTheatre <- filter(Otis, Theatre == k)
- graphTheatre <- graphTheatre %>% 
-   filter(!is.na(Op_start_min) & !is.na(Op_end_min))
- x <- graphTheatre$Op_start_min
- y <- graphTheatre$Op_end_min
- z <- graphTheatre$Day_date
- loop <- nrow(graphTheatre)
- x <- as.list(x)
- y <- as.list(y)
- z <- as.list(z)
-
- for (i in 1:loop) {
-   day <- z[[i]]
-   start <- x[[i]]
-   if (start == 0) start = 1
-   end <- y[[i]]
-   if (end == 0) end = 1
-   for (j in start:end) {
-     ot_count[[day,j]] <- ot_count[[day,j]] + 1
-   }
- }
-
-
-time_stamp <- array(1:2, dim = c(1440,2))
-
-for (j in 1:1440) {
-  time_stamp[[j,1]] <- j
-  time_stamp[[j,2]] <- 0
-}
-
-for (j in 495:735) {
-  time_stamp[[j,2]] <- 1
-}
-
-for (j in 810:1050) {
-  time_stamp[[j,2]] <-  1
-}
-
-time_stamp <- as.tibble(time_stamp)
-
-time_stamp <- time_stamp %>% 
-  select(V2) %>% 
-  rename(time_stamp = V2)
-
-mean_pat <-  apply(ot_count,2, mean)
-mean_pat <-  as.tibble(mean_pat)
-mean_pat <- rename(mean_pat, Average = value)
-quantile_pat <- apply(ot_count,2, quantile, 0.85)
-quantile_pat <- as.tibble(quantile_pat)
-quantile_pat <- rename(quantile_pat, percentile_85 = value)
-median_pat <-  apply(ot_count,2, median)
-median_pat <-  as.tibble(median_pat)
-median_pat <- rename(median_pat, Median = value)
-
-
-graph_data <- as.tibble(1:1440)
-graph_data <- rename(graph_data, Time = value)
-
-graph_data <- bind_cols(graph_data, mean_pat)
-graph_data <- bind_cols(graph_data, quantile_pat)
-
-graph_data <- graph_data %>% 
-  mutate(Time = Time / 60, Average = Average, percentile_85 = percentile_85)
-
-graph_data <- bind_cols(graph_data, time_stamp)
-
-ggplot(data = graph_data) +
-  geom_col(aes(x = Time, y = Average, colour = "red")) +
-  geom_line(aes(x = Time, y = percentile_85, colour = "blue")) +
-  geom_line(aes(x = Time, y = time_stamp, colour = "green")) +
-  scale_y_continuous(breaks = seq(0,2,0.2)) +
-  scale_x_continuous(breaks = seq(0,24,2)) +
-  ggtitle("Theatre usage by Orthopaedic cases in FY16-17 / min") +
-  labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes = aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("85th percentile", "Max # pats/min", "Avg # pats/min")) +
-  theme(legend.text = element_text(size = 7)) +
-  theme_economist()
-```
-
-
-###Total cases
-```{r ortho_total_cases, echo=FALSE, message=FALSE, warning=FALSE}
-Ortho_type <- Otis %>% 
-  filter(SpecialtyCode == "Orthopaedic") %>% 
-  filter(Modified == "AC" | Modified == "WL" | Modified == "AA")
-
-Ortho_load <- Ortho_type %>% 
-  group_by(Adjusted_week) %>% 
-  summarize(Count = n_distinct(Counter)) %>%
-  ungroup()
-
-Ortho_load$Adjusted_week <- as.integer(Ortho_load$Adjusted_week)
-
-ggplot(data = Ortho_load) + 
-  geom_line(aes(x = Adjusted_week, y = Count), colour = "red") +
-  geom_smooth(aes(x = Adjusted_week, y = Count), colour = "blue") +
-  labs(title = "Total number of orthopedic cases / week", subtitle = "Number of cases performed in a week", x = "Weeks since 1.July.2016", y = "Number of cases") +
-  theme_economist()
-```
-
-###Working week
-```{r ortho_working_week_day, echo=FALSE, message=FALSE, warning=FALSE}
-Ortho_type <- Otis %>% 
-  filter(SpecialtyCode == "Orthopaedic") %>% 
-  filter(DOW != 1 & DOW != 7 ) %>% 
-  filter(Morning_start <= Op_start_min & Op_start_min < Afternoon_end) %>% 
-  filter(Modified == "AC" | Modified == "WL" | Modified == "AA")
-
-Ortho_load <- Ortho_type %>% 
-  group_by(Adjusted_week) %>% 
-  summarize(Count = n_distinct(Counter)) %>%
-  ungroup()
-
-Ortho_load$Adjusted_week <- as.integer(Ortho_load$Adjusted_week)
-
-ggplot(data = Ortho_load) + 
-  geom_line(aes(x = Adjusted_week, y = Count), colour = "magenta") +
-  geom_smooth(aes(x = Adjusted_week, y = Count), colour = "yellow") +
-  labs(title = "Total number of cases / week", subtitle = "During the working week and in working hours", x = "Weeks since 1.July.2016", y = "Number of cases/week") +
-  theme_economist()
-```
-
-###AC vs WL
-```{r ortho_breakdown, echo=FALSE, warning=FALSE, message=FALSE}
-Ortho_type <- Otis %>% 
-  filter(SpecialtyCode == "Orthopaedic") %>% 
-  filter(Modified == "AC" | Modified == "WL" | Modified == "AA")
-
-Ortho_load <- Ortho_type %>% 
-  group_by(Adjusted_week, Modified) %>% 
-  summarize(Count = n()) %>%
-  ungroup()
-
-Ortho_load$Adjusted_week <- as.integer(Ortho_load$Adjusted_week)
-
-Ortho_load <- Ortho_load %>% 
-  filter(Count != 4 & Adjusted_week != 53) %>% 
-  spread(Modified, Count)
-
-ggplot(data = Ortho_load) +
-  geom_line(aes(x = Adjusted_week, y = AC, colour = "blue")) +
-  geom_smooth(aes(x = Adjusted_week, y = AC, colour = "blue"), se = FALSE) +
-  geom_line(aes(x = Adjusted_week, y = WL, colour = "green")) +
-  geom_smooth(aes(x = Adjusted_week, y = WL, colour = "green"), se = FALSE) +
-  labs(title = "Orthopaedic cases FY16-17", x = "Weeks", y = "Number of cases / week") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue"), labels = c("Acutes", "Electives"))+
-  theme(legend.text = element_text(size = 7)) +
-  theme_economist()
-```
-
-###Relationship
-```{r other_model, echo=FALSE, warning=FALSE, message=FALSE }
-ggplot(data = Ortho_load) +
-  geom_smooth(aes(x = WL, y = AC), colour = "tomato") +
-  labs(title = "Relationship between the number of acute vs elective cases / week", x = "Number of elective cases / week", y = "Number of acute cases /week")
-```
-
-###Forecast
-```{r Ortho_acute_demand, echo=FALSE, message=FALSE, warning=FALSE}
-Ortho_acute <- Otis %>% 
-  filter(SpecialtyCode == "Orthopaedic" & Modified == "AC")
-
-Ortho_acute <- Ortho_acute %>% 
-  group_by(Adjusted_week) %>% 
-  summarise(Count = n()) %>% 
-  ungroup
-
-Ortho_acute <- Ortho_acute %>% 
-  rename(Week = Adjusted_week)
-
-Ortho_ts <- ts(Ortho_acute$Count)
-Ortho_fc <- forecast(Ortho_ts, h = 12,level = c(65,95))
-autoplot(Ortho_fc, showgap = FALSE) +
-  labs(title = "Prediction of acute orthopaedic theatre demand", subtitle = "during the first 12 weeks of FY17-18", x = "Weeks", y = "Number acute cases / week") +
-  theme_economist()
+ggplot(data = Month_table) +
+  geom_col(aes(x = Month, y = Theatre1, fill = "red")) +
+  labs(title = "Total used elective sessions per month for Theatre 1", x = "Months in FY16", y = "Number of sessions") +
+  theme_economist() +
+  theme(legend.position = "none")
 
 ```
 
-#General Surgery
+###OT 2
+```{r tu_2, echo=FALSE, message=FALSE, warning=FALSE, results=FALSE}
 
-##Layout {.tabset .tabset-fade}
-
-###CaseCount
-```{r GenSurg_case_count, echo=FALSE, warning=FALSE, message=FALSE}
-GenSurg_list <- Otis %>% 
-  filter(SpecialtyCode == "General Surgery") %>% 
-  filter(DOW != 1 & DOW !=7) %>% 
-  filter(!is.na(Op_start_min) & !is.na(Op_end_min))
-
-GenSurg_list <- GenSurg_list %>% 
-  filter(Op_duration > 0)
-```
-
-In FY16 there was `r nrow(GenSurg_list)` orthopaedic operations performed (including both acute & elective) where;
-
-1. In the specialiality of General Surgery
-2. Between Monday and Friday
-3. Where a recorded anaesthetic starting time was in the morning or afternoon list times
-4. And a operation end time was entered into OTIS.
-
-The summary of the overall weekday procedure duration is;
-
-```{r GenSurg_case_count_2, echo=FALSE, warning=FALSE, message=FALSE}
-summary(GenSurg_list$Op_duration)
-```
-
-While the summary for all acute procedures is;
-
-```{r GenSurg_case_count_acyte, echo=FALSE, warning=FALSE, message=FALSE}
-GenSurg_acute <- Otis %>% 
-  filter(SpecialtyCode == "General Surgery") %>% 
-  filter(Modified == "AC") %>% 
-  filter(!is.na(Op_start_min) & !is.na(Op_end_min))
-
-GenSurg_acute <- GenSurg_acute %>% 
-  filter(Op_duration > 0)
-
-summary(GenSurg_acute$Op_duration)
+ggplot(data = Month_table) +
+  geom_col(aes(x = Month, y = Theatre2, fill = "red")) +
+  labs(title = "Total used elective sessions per month for Theatre 2", x = "Months in FY16", y = "Number of sessions") +
+  theme_economist() +
+  theme(legend.position = "none")
 
 ```
 
+###OT 3
+```{r tu_3, echo=FALSE, message=FALSE, warning=FALSE, results=FALSE}
 
-###Duration-week
-```{r GenSurg_duration, echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = GenSurg_list, aes(x = Op_duration)) +
-  geom_histogram(fill = "blue", binwidth = 5) +
-  scale_x_continuous(breaks = seq(0, 500, 50)) +
-  labs(title = "Histogram of operation duration", subtitle = "For General Surgery cases during the working week", x = "Minutes", y = "Frequency") +
-  theme_economist()
-
-ggplot(data = GenSurg_list, aes(x = Op_duration)) +
-  stat_ecdf(geom = "step", colour = "blue") +
-  scale_y_continuous(breaks = seq(0,2,0.2)) +
-  scale_x_continuous(breaks = seq(0,500,50)) +
-  labs(title = "Cumulative frequency for operation duration", subtitle = "For General Surgery cases during the working week", x = "Minutes", y = "Frequency") +
-  theme_economist()
-```
-
-###Duration-acute
-```{r GenSurg_duration_acute, echo=FALSE, warning=FALSE, message=FALSE}
-ggplot(data = GenSurg_acute, aes(x = Op_duration)) +
-  geom_histogram(fill = "blue", binwidth = 5) +
-  scale_x_continuous(breaks = seq(0, 500, 50)) +
-  labs(title = "Histogram of operation duration", subtitle = "For all acute General Surgery", x = "Minutes", y = "Frequency") +
-  theme_economist()
-
-ggplot(data = GenSurg_acute, aes(x = Op_duration)) +
-  stat_ecdf(geom = "step", colour = "blue") +
-  scale_y_continuous(breaks = seq(0,2,0.2)) +
-  scale_x_continuous(breaks = seq(0,500,50)) +
-  labs(title = "Cumulative frequency for operation duration", subtitle = "For all acute General Surgery", x = "Minutes", y = "Frequency") +
-  theme_economist()
-```
-
-
-###Theatre View
-```{r GenSurg_theatreView, echo=FALSE, message=FALSE, warning=FALSE}
-ot_count <- array(1:366, dim = c(366,1440))
-  for (i in 1:366) {
-    for (j in 1:1440) {
-      ot_count[[i,j]] <- 0
-    }
-  }
- graphTheatre <- filter(Otis, Theatre == k)
- graphTheatre <- graphTheatre %>% 
-   filter(!is.na(Op_start_min) & !is.na(Op_end_min))
- x <- graphTheatre$Op_start_min
- y <- graphTheatre$Op_end_min
- z <- graphTheatre$Day_date
- loop <- nrow(graphTheatre)
- x <- as.list(x)
- y <- as.list(y)
- z <- as.list(z)
-
- for (i in 1:loop) {
-   day <- z[[i]]
-   start <- x[[i]]
-   if (start == 0) start = 1
-   end <- y[[i]]
-   if (end == 0) end = 1
-   for (j in start:end) {
-     ot_count[[day,j]] <- ot_count[[day,j]] + 1
-   }
- }
-
-
-time_stamp <- array(1:2, dim = c(1440,2))
-
-for (j in 1:1440) {
-  time_stamp[[j,1]] <- j
-  time_stamp[[j,2]] <- 0
-}
-
-for (j in 495:735) {
-  time_stamp[[j,2]] <- 1
-}
-
-for (j in 810:1050) {
-  time_stamp[[j,2]] <-  1
-}
-
-time_stamp <- as.tibble(time_stamp)
-
-time_stamp <- time_stamp %>% 
-  select(V2) %>% 
-  rename(time_stamp = V2)
-
-mean_pat <-  apply(ot_count,2, mean)
-mean_pat <-  as.tibble(mean_pat)
-mean_pat <- rename(mean_pat, Average = value)
-quantile_pat <- apply(ot_count,2, quantile, 0.85)
-quantile_pat <- as.tibble(quantile_pat)
-quantile_pat <- rename(quantile_pat, percentile_85 = value)
-median_pat <-  apply(ot_count,2, median)
-median_pat <-  as.tibble(median_pat)
-median_pat <- rename(median_pat, Median = value)
-
-
-graph_data <- as.tibble(1:1440)
-graph_data <- rename(graph_data, Time = value)
-
-graph_data <- bind_cols(graph_data, mean_pat)
-graph_data <- bind_cols(graph_data, quantile_pat)
-
-graph_data <- graph_data %>% 
-  mutate(Time = Time / 60, Average = Average, percentile_85 = percentile_85)
-
-graph_data <- bind_cols(graph_data, time_stamp)
-
-ggplot(data = graph_data) +
-  geom_col(aes(x = Time, y = Average, colour = "red")) +
-  geom_line(aes(x = Time, y = percentile_85, colour = "blue")) +
-  geom_line(aes(x = Time, y = time_stamp, colour = "green")) +
-  scale_y_continuous(breaks = seq(0,2,0.2)) +
-  scale_x_continuous(breaks = seq(0,24,2)) +
-  ggtitle("Theatre usage by General Surgery cases in FY16-17 / min") +
-  labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes = aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("85th percentile", "Max # pats/min", "Avg # pats/min")) +
-  theme(legend.text = element_text(size = 7)) +
-  theme_economist()
-```
-
-
-###Total cases
-```{r GenSurg_total_cases, echo=FALSE, message=FALSE, warning=FALSE}
-GenSurg_type <- Otis %>% 
-  filter(SpecialtyCode == "General Surgery") %>% 
-  filter(Modified == "AC" | Modified == "WL" | Modified == "AA")
-
-GenSurg_load <- GenSurg_type %>% 
-  group_by(Adjusted_week) %>% 
-  summarize(Count = n_distinct(Counter)) %>%
-  ungroup()
-
-GenSurg_load$Adjusted_week <- as.integer(GenSurg_load$Adjusted_week)
-
-ggplot(data = GenSurg_load) + 
-  geom_line(aes(x = Adjusted_week, y = Count), colour = "red") +
-  geom_smooth(aes(x = Adjusted_week, y = Count), colour = "blue") +
-  labs(title = "Total number of General Surgery cases / week", subtitle = "Number of cases performed in a week", x = "Weeks since 1.July.2016", y = "Number of cases") +
-  theme_economist()
-```
-
-###Working week
-```{r GenSurg_working_week_day, echo=FALSE, message=FALSE, warning=FALSE}
-GenSurg_type <- Otis %>% 
-  filter(SpecialtyCode == "General Surgery") %>% 
-  filter(DOW != 1 & DOW != 7 ) %>% 
-  filter(Morning_start <= Op_start_min & Op_start_min < Afternoon_end) %>% 
-  filter(Modified == "AC" | Modified == "WL" | Modified == "AA")
-
-GenSurg_load <- GenSurg_type %>% 
-  group_by(Adjusted_week) %>% 
-  summarize(Count = n_distinct(Counter)) %>%
-  ungroup()
-
-GenSurg_load$Adjusted_week <- as.integer(GenSurg_load$Adjusted_week)
-
-ggplot(data = GenSurg_load) + 
-  geom_line(aes(x = Adjusted_week, y = Count), colour = "magenta") +
-  geom_smooth(aes(x = Adjusted_week, y = Count), colour = "yellow") +
-  labs(title = "Total number of cases / week", subtitle = "During the working week and in working hours", x = "Weeks since 1.July.2016", y = "Number of cases/week") +
-  theme_economist()
-```
-
-###AC vs WL
-```{r GenSurg_breakdown, echo=FALSE, warning=FALSE, message=FALSE}
-GenSurg_type <- Otis %>% 
-  filter(SpecialtyCode == "General Surgery") %>% 
-  filter(Modified == "AC" | Modified == "WL" | Modified == "AA")
-
-GenSurg_load <- GenSurg_type %>% 
-  group_by(Adjusted_week, Modified) %>% 
-  summarize(Count = n()) %>%
-  ungroup()
-
-GenSurg_load$Adjusted_week <- as.integer(GenSurg_load$Adjusted_week)
-
-GenSurg_load <- GenSurg_load %>% 
-  filter(Count != 4 & Adjusted_week != 53) %>% 
-  spread(Modified, Count)
-
-ggplot(data = GenSurg_load) +
-  geom_line(aes(x = Adjusted_week, y = AC, colour = "blue")) +
-  geom_smooth(aes(x = Adjusted_week, y = AC, colour = "blue"), se = FALSE) +
-  geom_line(aes(x = Adjusted_week, y = WL, colour = "green")) +
-  geom_smooth(aes(x = Adjusted_week, y = WL, colour = "green"), se = FALSE) +
-  labs(title = "General Surgery cases FY16-17", x = "Weeks", y = "Number of cases / week") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue"), labels = c("Acutes", "Electives"))+
-  theme(legend.text = element_text(size = 7)) +
-  theme_economist()
-```
-
-###Relationship
-```{r GenSurg_model, echo=FALSE, warning=FALSE, message=FALSE }
-ggplot(data = GenSurg_load) +
-  geom_smooth(aes(x = WL, y = AC), colour = "tomato") +
-  labs(title = "Relationship between the number of acute vs elective cases / week", x = "Number of elective cases / week", y = "Number of acute cases /week")
-```
-
-###Forecast
-```{r GenSurg_acute_demand, echo=FALSE, message=FALSE, warning=FALSE}
-GenSurg_acute <- Otis %>% 
-  filter(SpecialtyCode == "General Surgery" & Modified == "AC")
-
-GenSurg_acute <- GenSurg_acute %>% 
-  group_by(Adjusted_week) %>% 
-  summarise(Count = n()) %>% 
-  ungroup
-
-GenSurg_acute <- GenSurg_acute %>% 
-  rename(Week = Adjusted_week)
-
-GenSurg_ts <- ts(GenSurg_acute$Count)
-GenSurg_fc <- forecast(GenSurg_ts, h = 12,level = c(65,95))
-autoplot(GenSurg_fc, showgap = FALSE) +
-  labs(title = "Prediction of acute General Surgery theatre demand", subtitle = "during the first 12 weeks of FY17-18", x = "Weeks", y = "Number acute cases / week") +
-  theme_economist()
+ggplot(data = Month_table) +
+  geom_col(aes(x = Month, y = Theatre3, fill = "red")) +
+  labs(title = "Total used elective sessions per month for Theatre 3", x = "Months in FY16", y = "Number of sessions") +
+  theme_economist() +
+  theme(legend.position = "none")
 
 ```
 
+###OT 5
+```{r tu_5, echo=FALSE, message=FALSE, warning=FALSE, results=FALSE}
 
+ggplot(data = Month_table) +
+  geom_col(aes(x = Month, y = Theatre5, fill = "red")) +
+  labs(title = "Total used elective sessions per month for Theatre 5", x = "Months in FY16", y = "Number of sessions") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+```
+
+###OT 6
+```{r tu_6, echo=FALSE, message=FALSE, warning=FALSE, results=FALSE}
+
+ggplot(data = Month_table) +
+  geom_col(aes(x = Month, y = Theatre6, fill = "red")) +
+  labs(title = "Total used elective sessions per month for Theatre 6", x = "Months in FY16", y = "Number of sessions") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+```
+
+###OT 7
+```{r tu_7, echo=FALSE, message=FALSE, warning=FALSE, results=FALSE}
+
+ggplot(data = Month_table) +
+  geom_col(aes(x = Month, y = Theatre7, fill = "red")) +
+  labs(title = "Total used elective sessions per month for Theatre 7", x = "Months in FY16", y = "Number of sessions") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+```
