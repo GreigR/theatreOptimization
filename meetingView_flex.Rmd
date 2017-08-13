@@ -525,6 +525,12 @@ time_stamp <- time_stamp %>%
   select(V2) %>% 
   rename(time_stamp = V2)
 
+  for (i in 1:366) {
+    for (j in 1:1440) {
+      ifelse(ot_count[[i,j]] >= 1, 1, 0) 
+    }
+  }
+
 mean_pat <-  apply(ot_count,2, mean)
 mean_pat <-  as.tibble(mean_pat)
 mean_pat <- rename(mean_pat, Average = value)
@@ -611,6 +617,14 @@ time_stamp <- time_stamp %>%
   select(V2) %>% 
   rename(time_stamp = V2)
 
+  for (i in 1:366) {
+    for (j in 1:1440) {
+      ot_count[[i,j]] <- ifelse(ot_count[[i,j]] >= 1, 1, 0) 
+    }
+  }
+
+write.table(ot_count, "/home/greig/R-projects/Clinical_audits/Theatre/ot_count.csv", sep = ",", row.names = FALSE)
+
 mean_pat <-  apply(ot_count,2, mean, na.rm = TRUE)
 mean_pat <-  as.tibble(mean_pat)
 mean_pat <- rename(mean_pat, Average = value)
@@ -621,6 +635,7 @@ median_pat <-  apply(ot_count,2, median)
 median_pat <-  as.tibble(median_pat)
 median_pat <- rename(median_pat, Median = value)
 
+write.table(mean_pat, "/home/greig/R-projects/Clinical_audits/Theatre/Mean_pat.csv", sep = ",", row.names = FALSE)
 
 graph_data <- as.tibble(1:1440)
 graph_data <- rename(graph_data, Time = value)
@@ -635,11 +650,12 @@ graph_data <- bind_cols(graph_data, time_stamp)
 
 ggplot(data = graph_data) +
   geom_col(aes(x = Time, y = Average, colour = "red")) +
-  scale_y_continuous(breaks = seq(0,2,0.2)) +
+   geom_line(aes(x= Time, y = time_stamp, colour = "green")) +
+  scale_y_continuous(breaks = seq(0,1,0.2)) +
   scale_x_continuous(breaks = seq(0,24,2)) +
   ggtitle("               Theatre 4 usage 2016 / min ") +
   labs(x = "Time (hrs)", y = "Average number of patients / min of theatre") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("red" = "red"), labels = c("Session times", "Avg # pats/min")) +
+  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("red" = "red", "green" = "green"), labels = c("Session times", "Avg # pats/min")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
 ```
@@ -931,6 +947,7 @@ ggplot(data = Case_week) +
   theme_economist()
 
 Duration_week <- Otis %>% 
+  filter(Theatre != "4") %>% 
   group_by(Adjusted_week) %>% 
   summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
 
@@ -942,7 +959,7 @@ ggplot(data = Duration_week) +
   theme(legend.position = "none")
 
 Duration_week <- Otis %>% 
-  filter(Modified == "WL") %>% 
+  filter(Modified == "WL" & Theatre != "4") %>% 
   group_by(Adjusted_week) %>% 
   summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
 
@@ -1120,63 +1137,6 @@ ggplot(data = Duration_week) +
   geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "yellow1")) +
   geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "green1")) +
   labs(title = "Average duration of WL cases for theatre 3", x = "Weeks since 1.July.2016", y = "Minutes") +
-  theme_economist() +
-  theme(legend.position = "none")
-
-#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/WL_dur.csv")
-```
-
-###OT4
-```{r tc_ot4, echo=FALSE, warning=FALSE, message=FALSE}
-Case_week <- Otis %>% 
-  filter(Theatre == "4") %>% 
-  group_by(Adjusted_week, Modified) %>% 
-  summarise(Count = n())
-
-Case_week <- spread(Case_week, Modified, Count)
-
-Case_week$Total <- rowSums(Case_week[2:6], na.rm = TRUE)
-
-ggplot(data = Case_week) +
-  geom_line(aes(x = Adjusted_week, y = Total), colour = "red") +
-  geom_smooth(aes(x = Adjusted_week, y  = Total), colour = "red") +
-  labs(title = "Total cases for theatre 4 / week", subtitle = "For FY16-17", x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
-  theme_economist() +
-  theme(legend.position = "none")
-
-ggplot(data = Case_week) +
-  geom_line(aes(x = Adjusted_week, y = AC, colour = "green")) +
-  geom_line(aes(x = Adjusted_week, y = WL, colour = "blue")) +
-  geom_line(aes(x = Adjusted_week, y = AA, colour = "red")) +
-  ggtitle("Number of cases for theatre 4 / week by type") +
-  labs(x = "Weeks since 1.July.2016", y= "Total number of cases/week") +
-  scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
-  theme(legend.text = element_text(size = 7)) +
-  theme_economist()
-
-Duration_week <- Otis %>% 
-  filter(Theatre == "4") %>% 
-  group_by(Adjusted_week) %>% 
-  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
-
-ggplot(data = Duration_week) +
-  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "violetred")) +
-  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "orchid1")) +
-  labs(title = "Average duration of cases for theatre 4", x = "Weeks since 1.July.2016", y = "Minutes") +
-  theme_economist() +
-  theme(legend.position = "none")
-
-#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/Mean_dur.csv")
-
-Duration_week <- Otis %>% 
-  filter(Modified == "WL" & Theatre == "4") %>% 
-  group_by(Adjusted_week) %>% 
-  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
-
-ggplot(data = Duration_week) +
-  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "yellow1")) +
-  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "green1")) +
-  labs(title = "Average duration of WL cases for theatre 4", x = "Weeks since 1.July.2016", y = "Minutes") +
   theme_economist() +
   theme(legend.position = "none")
 
