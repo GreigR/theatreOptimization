@@ -935,8 +935,8 @@ Duration_week <- Otis %>%
   summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
 
 ggplot(data = Duration_week) +
-  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "orchid1")) +
-  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "violetred")) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "violetred")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "orchid1")) +
   labs(title = "Average duration of cases for all theatres", x = "Weeks since 1.July.2016", y = "Minutes") +
   theme_economist() +
   theme(legend.position = "none")
@@ -982,6 +982,34 @@ ggplot(data = Case_week) +
   scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
+
+Duration_week <- Otis %>% 
+  filter(Theatre == "1") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "violetred")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "orchid1")) +
+  labs(title = "Average duration of cases for theatre 1", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/Mean_dur.csv")
+
+Duration_week <- Otis %>% 
+  filter(Modified == "WL" & Theatre == "1") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "yellow1")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "green1")) +
+  labs(title = "Average duration of WL cases for theatre 1", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/WL_dur.csv")
 ```
 
 ###OT2
@@ -1011,6 +1039,34 @@ ggplot(data = Case_week) +
   scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
+
+Duration_week <- Otis %>% 
+  filter(Theatre == "2") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "violetred")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "orchid1")) +
+  labs(title = "Average duration of cases for theatre 2", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/Mean_dur.csv")
+
+Duration_week <- Otis %>% 
+  filter(Modified == "WL" & Theatre == "2") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "yellow1")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "green1")) +
+  labs(title = "Average duration of WL cases for theatre 2", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/WL_dur.csv")
 ```
 
 ###OT3
@@ -1040,6 +1096,34 @@ ggplot(data = Case_week) +
   scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
+
+Duration_week <- Otis %>% 
+  filter(Theatre == "3") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "violetred")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "orchid1")) +
+  labs(title = "Average duration of cases for theatre 3", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/Mean_dur.csv")
+
+Duration_week <- Otis %>% 
+  filter(Modified == "WL" & Theatre == "3") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "yellow1")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "green1")) +
+  labs(title = "Average duration of WL cases for theatre 3", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/WL_dur.csv")
 ```
 
 ###OT4
@@ -1069,6 +1153,34 @@ ggplot(data = Case_week) +
   scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
+
+Duration_week <- Otis %>% 
+  filter(Theatre == "4") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "violetred")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "orchid1")) +
+  labs(title = "Average duration of cases for theatre 4", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/Mean_dur.csv")
+
+Duration_week <- Otis %>% 
+  filter(Modified == "WL" & Theatre == "4") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "yellow1")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "green1")) +
+  labs(title = "Average duration of WL cases for theatre 4", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/WL_dur.csv")
 ```
 
 ###OT5
@@ -1098,6 +1210,34 @@ ggplot(data = Case_week) +
   scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
+
+Duration_week <- Otis %>% 
+  filter(Theatre == "5") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "violetred")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "orchid1")) +
+  labs(title = "Average duration of cases for theatre 5", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/Mean_dur.csv")
+
+Duration_week <- Otis %>% 
+  filter(Modified == "WL" & Theatre == "5") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "yellow1")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "green1")) +
+  labs(title = "Average duration of WL cases for theatre 5", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/WL_dur.csv")
 ```
 
 ###OT6
@@ -1127,6 +1267,34 @@ ggplot(data = Case_week) +
   scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
+
+Duration_week <- Otis %>% 
+  filter(Theatre == "6") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "violetred")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "orchid1")) +
+  labs(title = "Average duration of cases for theatre 6", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/Mean_dur.csv")
+
+Duration_week <- Otis %>% 
+  filter(Modified == "WL" & Theatre == "6") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "yellow1")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "green1")) +
+  labs(title = "Average duration of WL cases for theatre 6", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/WL_dur.csv")
 ```
 
 ###OT7
@@ -1156,6 +1324,34 @@ ggplot(data = Case_week) +
   scale_color_manual(name = "Legend", guide = guide_legend(override.aes=aes(fill = "white")), values = c("green" = "green", "blue" = "blue", "red" = "red"), labels = c("WL", "AC", "AA")) +
   theme(legend.text = element_text(size = 7)) +
   theme_economist()
+
+Duration_week <- Otis %>% 
+  filter(Theatre == "7") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "violetred")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "orchid1")) +
+  labs(title = "Average duration of cases for theatre 7", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/Mean_dur.csv")
+
+Duration_week <- Otis %>% 
+  filter(Modified == "WL" & Theatre == "7") %>% 
+  group_by(Adjusted_week) %>% 
+  summarise(Mean_duration = mean(Op_duration, na.rm=TRUE))
+
+ggplot(data = Duration_week) +
+  geom_line(aes(x = Adjusted_week, y = Mean_duration, colour = "yellow1")) +
+  geom_smooth(aes(x = Adjusted_week, y = Mean_duration, colour = "green1")) +
+  labs(title = "Average duration of WL cases for theatre 7", x = "Weeks since 1.July.2016", y = "Minutes") +
+  theme_economist() +
+  theme(legend.position = "none")
+
+#write_csv(Duration_week, "/home/greig/R-projects/Clinical_audits/Theatre/WL_dur.csv")
 ```
 
 #Turaround times
