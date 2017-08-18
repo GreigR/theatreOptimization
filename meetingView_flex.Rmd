@@ -1896,3 +1896,116 @@ ggplot(data = Month_table) +
   theme(legend.position = "none")
 
 ```
+
+#Cancellations
+
+##Layout {.tabset .tabset-fade}
+
+###Suite
+```{r cancel_all, echo=FALSE, message=FALSE, warning=FALSE}
+Cancel <-  Otis %>% 
+  filter(!is.na(Group_Description)) %>% 
+  group_by(Group_Description) %>% 
+  summarise(Count = n()) %>% 
+  arrange(desc(Count))
+
+kable(Cancel)
+```
+
+###By Type
+```{r cancel_type, echo=FALSE, message=FALSE, warning=FALSE}
+Cancel <- Otis %>% 
+  filter(!is.na(Group_Description)) %>% 
+  group_by(Group_Description, Modified) %>% 
+  summarise(Count = n()) %>% 
+  arrange(desc(Count)) %>% 
+  rename(Surgery_type = Modified)
+
+Cancel <- spread(Cancel, Surgery_type, Count)
+
+kable(Cancel)
+```
+
+###General Surgery
+```{r cancel_genSurg, echo=FALSE, warning=FALSE, message=FALSE}
+Cancel <- Otis %>% 
+  filter(SpecialtyCode == "General Surgery") %>% 
+  group_by(Group_Description, Modified) %>% 
+  summarise(Count = n()) %>% 
+  arrange(desc(Count)) %>% 
+  rename(Surgery_type = Modified)
+
+Cancel <- spread(Cancel, Surgery_type, Count)
+
+kable(Cancel)
+```
+
+###Orthopaedic
+```{r cancel_Ortho, warning=FALSE, echo=FALSE, message=FALSE}
+Cancel <- Otis %>% 
+  filter(SpecialtyCode == "Orthopaedic") %>% 
+  group_by(Group_Description, Modified) %>% 
+  summarise(Count = n()) %>% 
+  arrange(desc(Count)) %>% 
+  rename(Surgery_type = Modified)
+
+Cancel <- spread(Cancel, Surgery_type, Count)
+
+kable(Cancel)
+```
+
+###O&G
+```{r cancel_ObsGyn, echo=FALSE, warning=FALSE, message=FALSE}
+Cancel <- Otis %>% 
+  filter(SpecialtyCode == "Obstetric" | SpecialtyCode == "Gynaecology") %>% 
+  group_by(Group_Description, Modified) %>% 
+  summarise(Count = n()) %>% 
+  arrange(desc(Count)) %>% 
+  rename(Surgery_type = Modified)
+
+Cancel <- spread(Cancel, Surgery_type, Count)
+
+kable(Cancel)
+```
+
+###ORL
+```{r cancel_ORL, echo=FALSE, warning=FALSE, message=FALSE}
+Cancel <- Otis %>% 
+  filter(SpecialtyCode == "Otorhinolaryrngology (ENT)") %>% 
+  group_by(Group_Description, Modified) %>% 
+  summarise(Count = n()) %>% 
+  arrange(desc(Count)) %>% 
+  rename(Surgery_type = Modified)
+
+Cancel <- spread(Cancel, Surgery_type, Count)
+
+kable(Cancel)
+```
+
+###Eyes
+```{r cancel_eyes, echo=FALSE, warning=FALSE, message=FALSE}
+Cancel <- Otis %>% 
+  filter(SpecialtyCode == "Ophthalmology") %>% 
+  group_by(Group_Description, Modified) %>% 
+  summarise(Count = n()) %>% 
+  arrange(desc(Count)) %>% 
+  rename(Surgery_type = Modified)
+
+Cancel <- spread(Cancel, Surgery_type, Count)
+
+kable(Cancel)
+```
+
+###Urology
+```{r cancel_Urology, echo=FALSE, warning=FALSE, message=FALSE}
+Cancel <- Otis %>% 
+  filter(SpecialtyCode == "Urology") %>% 
+  group_by(Group_Description, Modified) %>% 
+  summarise(Count = n()) %>% 
+  arrange(desc(Count)) %>% 
+  rename(Surgery_type = Modified)
+
+Cancel <- spread(Cancel, Surgery_type, Count)
+
+kable(Cancel)
+```
