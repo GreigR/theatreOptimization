@@ -2068,3 +2068,153 @@ List_countLate <- arrange(List_countLate, Month)
 kable(List_countLate)
 ```
 
+###Morning - Early finishes
+```{r early_end_morning, echo=FALSE, warning=FALSE, message=FALSE}
+List_endTime <- List_time %>% 
+  group_by(Month, Event_Date, Theatre) %>% 
+  summarise(Max_end = max(Op_start_min, na.rm = TRUE))
+
+List_end <- List_endTime %>% 
+  filter(Max_end < Morning_end) %>% 
+  group_by(Event_Date, Theatre) %>% 
+  summarise(Early_end = sum(Morning_end - Max_end)) %>% 
+  filter(Theatre == "1" | Theatre == "2" | Theatre == "3" | Theatre == "5" | Theatre == "6" | Theatre == "7") %>% 
+  mutate(Month = month(Event_Date))
+
+List_countEnd_early <- List_end %>% 
+  group_by(Month, Theatre) %>% 
+  summarise(morning_earlyEnd = sum(Early_end, na.rm = TRUE)) %>% 
+  spread(Theatre, morning_earlyEnd)
+
+List_countEnd_early$Month <- as.factor(List_countEnd_early$Month)
+List_countEnd_early$Month <- fct_relevel(List_countEnd_early$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+List_countEnd_early <- arrange(List_countEnd_early, Month)
+
+kable(List_countEnd_early)
+```
+
+###Morning - Late finishes
+```{r late_end_morning, echo=FALSE, warning=FALSE, message=FALSE}
+List_end <- List_endTime %>% 
+  filter(Morning_end <= Max_end) %>% 
+  group_by(Event_Date, Theatre) %>% 
+  summarise(Late_end = sum(Max_end - Morning_end)) %>% 
+  filter(Theatre == "1" | Theatre == "2" | Theatre == "3" | Theatre == "5" | Theatre == "6" | Theatre == "7") %>% 
+  mutate(Month = month(Event_Date))
+
+List_countEnd_late <- List_end %>% 
+  group_by(Month, Theatre) %>% 
+  summarise(morning_lateEnd = sum(Late_end, na.rm = TRUE)) %>% 
+  spread(Theatre, morning_lateEnd)
+
+List_countEnd_late$Month <- as.factor(List_countEnd_late$Month)
+List_countEnd_late$Month <- fct_relevel(List_countEnd_late$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+List_countEnd_late <- arrange(List_countEnd_late, Month)
+
+kable(List_countEnd_late)
+```
+
+###Afternoon - Early starts
+```{r early_start_afternoon, echo=FALSE, warning=FALSE, message=FALSE}
+List_time <- Otis %>% 
+  filter((Morning_end < Op_start_min & Op_end_min <= Afternoon_end) | (Afternoon_start <= Op_start_min & Op_end_min <= Afternoon_end) | (Afternoon_start <= Op_start_min & Afternoon_end < Op_end_min)) %>% 
+  filter(Theatre != "4") %>% 
+  filter(DOW != 1 & DOW != 6) %>% 
+  select(Event_Date, Theatre, Op_start_min, Op_end_min, Month, Adjusted_week, SpecialtyCode)
+
+List_startTime <- List_time %>% 
+  group_by(Month, Event_Date, Theatre) %>% 
+  summarise(Min_start = min(Op_start_min, na.rm = TRUE))
+
+List_early <- List_startTime %>% 
+  filter(Min_start < Afternoon_start) %>% 
+  group_by(Event_Date, Theatre) %>% 
+  summarise(Early_start = sum(Afternoon_start - Min_start)) %>% 
+  filter(Theatre == "1" | Theatre == "2" | Theatre == "3" | Theatre == "5" | Theatre == "6" | Theatre == "7") %>% 
+  mutate(Month = month(Event_Date))
+
+List_countEarly <- List_early %>% 
+  group_by(Month, Theatre) %>% 
+  summarise(morning_earlyStart = sum(Early_start, na.rm = TRUE)) %>% 
+  spread(Theatre, morning_earlyStart)
+
+List_countEarly$Month <- as.factor(List_countEarly$Month)
+List_countEarly$Month <- fct_relevel(List_countEarly$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+List_countEarly <- arrange(List_countEarly, Month)
+
+kable(List_countEarly)
+```
+
+###Afternoon - Late starts
+```{r late_start_afternoons, echo=FALSE, warning=FALSE, message=FALSE}
+List_late <- List_startTime %>% 
+  filter(Afternoon_start <= Min_start) %>% 
+  group_by(Event_Date, Theatre) %>% 
+  summarise(Late_start = sum(Min_start - Afternoon_start)) %>% 
+  filter(Theatre == "1" | Theatre == "2" | Theatre == "3" | Theatre == "5" | Theatre == "6" | Theatre == "7") %>% 
+  mutate(Month = month(Event_Date))
+
+List_countLate <- List_late %>% 
+  group_by(Month, Theatre) %>% 
+  summarise(morning_lateStart = sum(Late_start, na.rm = TRUE)) %>% 
+  spread(Theatre, morning_lateStart)
+
+List_countLate$Month <- as.factor(List_countLate$Month)
+List_countLate$Month <- fct_relevel(List_countLate$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+List_countLate <- arrange(List_countLate, Month)
+
+kable(List_countLate)
+```
+
+###Afternoon - Early finishes
+```{r early_end_afternoons, echo=FALSE, warning=FALSE, message=FALSE}
+List_endTime <- List_time %>% 
+  group_by(Month, Event_Date, Theatre) %>% 
+  summarise(Max_end = max(Op_start_min, na.rm = TRUE))
+
+List_end <- List_endTime %>% 
+  filter(Max_end < Afternoon_end) %>% 
+  group_by(Event_Date, Theatre) %>% 
+  summarise(Early_end = sum(Afternoon_end - Max_end)) %>% 
+  filter(Theatre == "1" | Theatre == "2" | Theatre == "3" | Theatre == "5" | Theatre == "6" | Theatre == "7") %>% 
+  mutate(Month = month(Event_Date))
+
+List_countEnd_early <- List_end %>% 
+  group_by(Month, Theatre) %>% 
+  summarise(morning_earlyEnd = sum(Early_end, na.rm = TRUE)) %>% 
+  spread(Theatre, morning_earlyEnd)
+
+List_countEnd_early$Month <- as.factor(List_countEnd_early$Month)
+List_countEnd_early$Month <- fct_relevel(List_countEnd_early$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+List_countEnd_early <- arrange(List_countEnd_early, Month)
+
+kable(List_countEnd_early)
+```
+
+###Afternoon - Late finishes
+```{r late_end_afternoons, echo=FALSE, warning=FALSE, message=FALSE}
+List_end <- List_endTime %>% 
+  filter(Afternoon_end <= Max_end) %>% 
+  group_by(Event_Date, Theatre) %>% 
+  summarise(Late_end = sum(Max_end - Afternoon_end)) %>% 
+  filter(Theatre == "1" | Theatre == "2" | Theatre == "3" | Theatre == "5" | Theatre == "6" | Theatre == "7") %>% 
+  mutate(Month = month(Event_Date))
+
+List_countEnd_late <- List_end %>% 
+  group_by(Month, Theatre) %>% 
+  summarise(morning_lateEnd = sum(Late_end, na.rm = TRUE)) %>% 
+  spread(Theatre, morning_lateEnd)
+
+List_countEnd_late$Month <- as.factor(List_countEnd_late$Month)
+List_countEnd_late$Month <- fct_relevel(List_countEnd_late$Month,"7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6")
+
+List_countEnd_late <- arrange(List_countEnd_late, Month)
+
+kable(List_countEnd_late)
+```
+
